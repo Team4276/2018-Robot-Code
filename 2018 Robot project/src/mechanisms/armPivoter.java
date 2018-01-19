@@ -1,5 +1,6 @@
 package mechanisms;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -26,6 +27,7 @@ public class armPivoter {
 	final double proportionalGain = 0;
 	final double integralGain = 0;
 	final double derivativeGain = 0;
+	final double torqueGain = 0;
 
 	public armPivoter(int pivoterCANPort) {
 
@@ -60,7 +62,28 @@ public class armPivoter {
 		return assignedPower;
 	}
 
-	public void findSetPoint() {
+	public double findHoldingPower() {
+		double assignedPower = 0;
+
+		/**
+		 * torque = m*(g+a)*Xcom*cos(theta)
+		 * 
+		 * assuming a = 0 for now
+		 * 
+		 */
+
+		double mass = 6.8; // placeholder
+		double gravity = 9.8; // placeholder
+		double acceleration = 0; // placeholder
+		double Xcom = .203; // placeholder
+		double theta = Math.PI * armPosition / 180;
+
+		assignedPower = torqueGain * (mass * (gravity + acceleration) * Xcom * Math.cos(theta));
+
+		return assignedPower;
+	}
+
+	public void findSetpoint() {
 
 		if (Robot.xboxController.getRawButton(Xbox.X)) {
 			armSetpoint = 0;
@@ -73,10 +96,20 @@ public class armPivoter {
 		}
 
 	}
-	
-	public void giveReadouts(){
+
+	public void assignMotorPower(double staticPower, double activePower) {
+		pivotMotor.set(ControlMode.PercentOutput, (staticPower + activePower));
+	}
+
+	public void giveReadouts() {
 		SmartDashboard.putNumber("Arm Angle Commanded", armSetpoint);
 		SmartDashboard.putNumber("Arm Angle Estimated", armPosition);
+	}
+
+	public void performMainProcessing() {
+		findSetpoint();
+		assignMotorPower(findHoldingPower(), computeMovementPower());
+		giveReadouts();
 	}
 
 }
