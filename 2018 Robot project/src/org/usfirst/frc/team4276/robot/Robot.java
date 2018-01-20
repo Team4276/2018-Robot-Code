@@ -4,7 +4,9 @@ package org.usfirst.frc.team4276.robot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.Timer;
-import autonomous.robotPositionFinder;
+
+import mechanisms.*;
+import static utilities.RoboRioPorts.*;
 
 public class Robot extends SampleRobot {
 	public static Timer systemTimer;
@@ -12,7 +14,7 @@ public class Robot extends SampleRobot {
 	public static Joystick logitechJoystickR;
 	public static Joystick xboxController;
 
-	robotPositionFinder rpf;
+	TeleOpDrive robotTankDrive;
 
 	public Robot() {
 		// Master timer
@@ -25,10 +27,11 @@ public class Robot extends SampleRobot {
 		xboxController = new Joystick(2);
 
 		// Autonomous
-		rpf = new robotPositionFinder(0, 1, 2, 3);// placeholders TEST
-		rpf.start();
 
 		// Mechanisms
+
+		robotTankDrive = new TeleOpDrive(DRIVE_DOUBLE_SOLENOID_FWD, DRIVE_DOUBLE_SOLENOID_REV, CAN_DRIVE_L1,
+				CAN_DRIVE_R1, CAN_DRIVE_L2, CAN_DRIVE_R2, CAN_DRIVE_L3, CAN_DRIVE_R3);
 	}
 
 	public void robotInit() {

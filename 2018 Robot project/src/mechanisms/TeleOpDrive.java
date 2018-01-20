@@ -22,11 +22,8 @@ public class TeleOpDrive {
 	public int highShifter = 4;
 	public int lowShifter = 3;
 
-	public TeleOpDrive(int leftJoyPort, int rightJoyPort, int shifterAPort, int shifterBPort, int leftCANPort,
-			int rightCANPort, int leftCANPort1, int rightCANPort1, int leftCANPort2, int rightCANPort2) {
-
-		leftJoystick = new Joystick(leftJoyPort);
-		rightJoystick = new Joystick(rightJoyPort);
+	public TeleOpDrive(int shifterAPort, int shifterBPort, int leftCANPort, int rightCANPort, int leftCANPort1,
+			int rightCANPort1, int leftCANPort2, int rightCANPort2) {
 
 		leftMotor = new VictorSPX(leftCANPort);
 		rightMotor = new VictorSPX(rightCANPort);
