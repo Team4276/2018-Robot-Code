@@ -27,20 +27,20 @@ public class armPivoter {
 	double armPositionError = 0;
 	double armPositionErrorLast = 0;
 	double accumulatedError = 0;
-	double armErrorRateOfChange = 0;
+	double rateError = 0;
 
 	boolean initializePID = true;
 	double timeNow;
 	double timePrevious;
 	double timeStep;
 
-	final double proportionalGain = 0;
-	final double integralGain = 0;
-	final double derivativeGain = 0;
-	final double torqueGain = 0;
+	final double PROPORTIONAL_GAIN = 0;
+	final double INTEGRAL_GAIN = 0;
+	final double DERIVATIVE_GAIN = 0;
+	final double TORQUE_GAIN = 0;
 	final double UPPER_LIMIT = 90;
 	final double LOWER_LIMIT = -90;
-	final double DISTANCE_PER_PULSE = 1; // placeholder
+	final double DEGREES_PER_PULSE = 1; // placeholder
 
 	public armPivoter(int pivoterCANPort) {
 
@@ -49,11 +49,10 @@ public class armPivoter {
 	}
 
 	private double computeMovementPower() {
-		double assignedPower = 0;
-		armPosition = pivotMotor.getSensorCollection().getQuadraturePosition();
+		double assignedPower;
 		if (initializePID == true) {
 			timeNow = Robot.systemTimer.get();
-			armPosition = pivotMotor.getSensorCollection().getQuadraturePosition();
+			armPosition = pivotMotor.getSensorCollection().getQuadraturePosition() * DEGREES_PER_PULSE;
 			armPositionError = armSetpoint - armPosition;
 			accumulatedError = 0.0;
 			assignedPower = 0.0;
@@ -61,8 +60,8 @@ public class armPivoter {
 		} else {
 			armPositionErrorLast = armPositionError;
 			timePrevious = timeNow;
-
 			timeNow = Robot.systemTimer.get();
+			armPosition = pivotMotor.getSensorCollection().getQuadraturePosition() * DEGREES_PER_PULSE;
 			timeStep = timeNow - timePrevious;
 
 			armPositionError = armSetpoint - armPosition; // proportional
@@ -70,10 +69,14 @@ public class armPivoter {
 																											// using
 																											// trapezoidal
 																											// approximation
-			armErrorRateOfChange = pivotMotor.getSensorCollection().getQuadratureVelocity(); // derivative
+			rateError = -pivotMotor.getSensorCollection().getQuadratureVelocity() * DEGREES_PER_PULSE * 10; // derivative
+																											// (*10
+																											// because
+																											// returns
+																											// counts/100ms)
 
-			assignedPower = proportionalGain * armPositionError + integralGain * accumulatedError
-					+ derivativeGain * armErrorRateOfChange;
+			assignedPower = PROPORTIONAL_GAIN * armPositionError + INTEGRAL_GAIN * accumulatedError
+					+ DERIVATIVE_GAIN * rateError;
 		}
 		return assignedPower;
 	}
@@ -91,10 +94,10 @@ public class armPivoter {
 		double mass = 6.8; // placeholder
 		double gravity = 9.8;
 		double acceleration = 0; // placeholder
-		double Xcom = .203; // placeholder
+		double xCM = .203; // placeholder
 		double theta = Math.PI * armPosition / 180;
 
-		assignedPower = torqueGain * (mass * (gravity + acceleration) * Xcom * Math.cos(theta));
+		assignedPower = TORQUE_GAIN * (mass * (gravity + acceleration) * xCM * Math.cos(theta));
 
 		return assignedPower;
 	}
