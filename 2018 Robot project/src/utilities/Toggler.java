@@ -6,7 +6,6 @@ public class Toggler {
 
 	private int button;
 	private boolean state = false;
-
 	private boolean currentButtonStatus = false;
 	private boolean previousButtonStatus;
 
@@ -14,9 +13,14 @@ public class Toggler {
 		button = joystickButton;
 	}
 
-	void updateMechanismState(double triggerValue) {
+	public void updateMechanismState(double triggerValue) {
 		previousButtonStatus = currentButtonStatus;
-		currentButtonStatus = (Robot.xboxController.getRawAxis(button) >= triggerValue);
+		if (triggerValue > 0) {
+			currentButtonStatus = (Robot.xboxController.getRawAxis(button) >= triggerValue);
+
+		} else {
+			currentButtonStatus = (Robot.xboxController.getRawAxis(button) <= triggerValue);
+		}
 		if (currentButtonStatus == true) {
 			if (previousButtonStatus == false) {
 				if (state == true) {
@@ -29,7 +33,7 @@ public class Toggler {
 
 	}
 
-	void updateMechanismState(int DpadState) {
+	public void updateMechanismState(int DpadState) {
 		previousButtonStatus = currentButtonStatus;
 		currentButtonStatus = (DpadState == Robot.xboxController.getPOV(button));
 		if (currentButtonStatus == true) {
@@ -43,10 +47,9 @@ public class Toggler {
 		}
 	}
 
-	void updateMechanismState() {
+	public void updateMechanismState() {
 		previousButtonStatus = currentButtonStatus;
 		currentButtonStatus = Robot.xboxController.getRawButton(button);
-
 		if (currentButtonStatus == true) {
 			if (previousButtonStatus == false) {
 				if (state == true) {
@@ -58,7 +61,7 @@ public class Toggler {
 		}
 	}
 
-	boolean getMechanismState() {
+	public boolean getMechanismState() {
 		return state;
 	}
 }
