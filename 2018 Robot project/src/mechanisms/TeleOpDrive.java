@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import com.ctre.CANTalon;
 
 public class TeleOpDrive {
 
@@ -18,8 +17,6 @@ public class TeleOpDrive {
 	VictorSPX rightMotorFollower1;
 	VictorSPX leftMotorFollower2;
 	VictorSPX rightMotorFollower2;
-
-	CANTalon reference;
 
 	public double leftDrivePower, rightDrivePower;
 	public int highShifter = 4;

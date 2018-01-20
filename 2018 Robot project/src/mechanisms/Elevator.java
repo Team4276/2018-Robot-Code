@@ -5,7 +5,12 @@ import org.usfirst.frc.team4276.robot.Robot;
 import utilities.Xbox;
 import edu.wpi.first.wpilibj.smartdashboard.*;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
 public class Elevator {
+
+	TalonSRX elevatorDriver1, elevatorDriver2;
 
 	final double POWER_OFFSET_MANIPULATOR = 4;
 	final double POWER_OFFSET_RAIL = 7;
@@ -16,7 +21,7 @@ public class Elevator {
 	final double SETPOINT_SCALE = 7;
 	final double SETPOINT_SWITCH = 3;
 	final double SETPOINT_BOTTOM = 1;
-	final double SETPOINT_INCREMENT = 5;
+	final double SETPOINT_INCREMENT = .05;
 
 	double estimatedHeight = 0;
 	double commandedHeight = 0;
@@ -25,6 +30,15 @@ public class Elevator {
 
 	final double initiliazedPoint = 0;
 	final double derivativePoint = 0;
+
+	public Elevator(int elevator1CANPort, int elevator2CANPort) {
+
+		elevatorDriver1 = new TalonSRX(elevator1CANPort);
+		elevatorDriver2 = new TalonSRX(elevator2CANPort);
+
+		elevatorDriver2.set(ControlMode.Follower, elevator2CANPort);
+
+	}
 
 	public void performMainProcess() {
 
@@ -45,24 +59,24 @@ public class Elevator {
 		} else if (Robot.xboxController.getRawAxis(Xbox.RAxisY) < -0.5) {
 			commandedHeight = commandedHeight - SETPOINT_INCREMENT;
 		}
-		if (commandedHeight > MANIPULATOR_RAIL_HEIGHT){
+		if (commandedHeight > MANIPULATOR_RAIL_HEIGHT) {
 			commandedHeight = MANIPULATOR_RAIL_HEIGHT;
-		} else if(commandedHeight > SETPOINT_BOTTOM){
+		} else if (commandedHeight > SETPOINT_BOTTOM) {
 			commandedHeight = SETPOINT_BOTTOM;
 		}
 
 		if (commandedHeight < MANIPULATOR_RAIL_HEIGHT) {
-			// insert estimatedHeight = encoder position
+			estimatedHeight = elevatorDriver1.getSensorCollection().getQuadraturePosition();
 			heightError = commandedHeight - estimatedHeight;
 			motorPower = POWER_OFFSET_MANIPULATOR + (KP_MANIPULATOR * heightError);
-			// insert apply power to motors
+			elevatorDriver1.set(ControlMode.PercentOutput, motorPower);
 		} else {
-			// insert estimatedHeight = encoder position
+			estimatedHeight = elevatorDriver1.getSensorCollection().getQuadraturePosition();
 			heightError = commandedHeight - estimatedHeight;
 			motorPower = POWER_OFFSET_RAIL + (KP_RAIL * heightError);
-			// insert apply power to motors
+			elevatorDriver1.set(ControlMode.PercentOutput, motorPower);
 		}
-		SmartDashboard.putNumber("Commanded arm height" ,commandedHeight);
-		SmartDashboard.putNumber("Estimated arm height" ,estimatedHeight);
+		SmartDashboard.putNumber("Commanded arm height", commandedHeight);
+		SmartDashboard.putNumber("Estimated arm height", estimatedHeight);
 	}
 }

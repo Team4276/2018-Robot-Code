@@ -8,6 +8,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.usfirst.frc.team4276.robot.Robot;
 import utilities.Xbox;
 
+/**
+ * 
+ * Placeholding values at lines: 43,88,90,91
+ * 
+ * Experimental values at lines: 39,40,41,42
+ * 
+ * @author Avery
+ *
+ */
+
 public class armPivoter {
 
 	TalonSRX pivotMotor;
@@ -28,6 +38,9 @@ public class armPivoter {
 	final double integralGain = 0;
 	final double derivativeGain = 0;
 	final double torqueGain = 0;
+	final double UPPER_LIMIT = 90;
+	final double LOWER_LIMIT = -90;
+	final double DISTANCE_PER_PULSE = 1; // placeholder
 
 	public armPivoter(int pivoterCANPort) {
 
@@ -53,7 +66,10 @@ public class armPivoter {
 			timeStep = timeNow - timePrevious;
 
 			armPositionError = armSetpoint - armPosition; // proportional
-			accumulatedError = accumulatedError + armPositionErrorLast * timeStep; // integral
+			accumulatedError = accumulatedError + (armPositionErrorLast + armPositionError) / 2 * timeStep; // integral
+																											// using
+																											// trapezoidal
+																											// approximation
 			armErrorRateOfChange = pivotMotor.getSensorCollection().getQuadratureVelocity(); // derivative
 
 			assignedPower = proportionalGain * armPositionError + integralGain * accumulatedError
@@ -73,7 +89,7 @@ public class armPivoter {
 		 */
 
 		double mass = 6.8; // placeholder
-		double gravity = 9.8; // placeholder
+		double gravity = 9.8;
 		double acceleration = 0; // placeholder
 		double Xcom = .203; // placeholder
 		double theta = Math.PI * armPosition / 180;
@@ -93,6 +109,11 @@ public class armPivoter {
 			} else if (Xbox.LAxisY < -.5) {
 				armSetpoint--;
 			}
+		}
+		if (armSetpoint > UPPER_LIMIT) {
+			armSetpoint = UPPER_LIMIT;
+		} else if (armSetpoint < LOWER_LIMIT) {
+			armSetpoint = LOWER_LIMIT;
 		}
 
 	}
