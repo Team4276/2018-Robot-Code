@@ -22,15 +22,25 @@ public class RoboRioPorts {
 	public static final int CAN_RAIL_DRIVER1 = 17;
 	public static final int CAN_RAIL_DRIVER2 = 18;
 
+	public static final int CAN_CLIMBER1 = 20;
+	public static final int CAN_CLIMBER2 = 21;
+
 	// *** PNUEMATICS ***
 	// Example:
 	// static final int DRIVE_DOUBLE_SOLENOID_FWD = 0;
 
 	public static final int DRIVE_DOUBLE_SOLENOID_FWD = 0;
-	public static final int DRIVE_DOUBLE_SOLENOID_REV = 0;
+	public static final int DRIVE_DOUBLE_SOLENOID_REV = 1;
+
+	public static final int CUBE_MANIPULATOR = 2;
 
 	// *** DIO ***
 	// Example:
-	// static final int DIO_DRIVE_FL_A = 0;
+	// static final int DIO_DRIVE_LEFT_A = 0;
+
+	public static final int DIO_DRIVE_LEFT_A = 0;
+	public static final int DIO_DRIVE_LEFT_B = 0;
+	public static final int DIO_DRIVE_RIGHT_A = 0;
+	public static final int DIO_DRIVE_RIGHT_B = 0;
 
 }

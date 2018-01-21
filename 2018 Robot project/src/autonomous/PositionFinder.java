@@ -1,23 +1,29 @@
 package autonomous;
 
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.NetworkTable;
+import mechanisms.ADIS16448_IMU;
 
-public class robotPositionFinder extends Thread implements Runnable {
+public class PositionFinder extends Thread implements Runnable {
 
 	Encoder placeholderLeft, placeholderRight;
-	double[] previousXY = new double[2];
-	double[] coordinates = new double[2];
+	static ADIS16448_IMU robotIMU;
 
-	public robotPositionFinder(int a, int b, int c, int d) {
+	private double[] previousXY = new double[2];
+	private double[] coordinates = new double[2];
 
-		placeholderLeft = new Encoder(a, b);
-		placeholderRight = new Encoder(c, d);
+	public PositionFinder(int encoder1A, int encoder1B, int encoder2A, int encoder2B) {
+
+		placeholderLeft = new Encoder(encoder1A, encoder1B);
+		placeholderRight = new Encoder(encoder2A, encoder2B);
+
+		robotIMU = new ADIS16448_IMU();
 
 	}
 
 	private double getHeading() {
-		double theta = 0;// place holder code
+		double theta = -1 * robotIMU.getYaw();
 		return theta;
 	}
 
@@ -46,10 +52,14 @@ public class robotPositionFinder extends Thread implements Runnable {
 		previousXY = XY;
 
 	}
-	
-	
-	public void sendCoordinatesToNetworkTables(){
-		
+
+	public void sendCoordinatesToNetworkTables() {
+
+	}
+
+	private void updateSmartDashboard() {
+		SmartDashboard.putNumber("Heading", getHeading());
+		SmartDashboard.putNumberArray("Robot Coordinates:", coordinates);
 	}
 
 	public void run() {

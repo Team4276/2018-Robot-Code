@@ -18,7 +18,7 @@ import utilities.Xbox;
  *
  */
 
-public class armPivoter {
+public class ArmPivoter {
 
 	TalonSRX pivotMotor;
 
@@ -42,7 +42,7 @@ public class armPivoter {
 	final double LOWER_LIMIT = -90;
 	final double DEGREES_PER_PULSE = 1; // placeholder
 
-	public armPivoter(int pivoterCANPort) {
+	public ArmPivoter(int pivoterCANPort) {
 
 		pivotMotor = new TalonSRX(pivoterCANPort);
 
@@ -132,6 +132,12 @@ public class armPivoter {
 
 	public void performMainProcessing() {
 		findSetpoint();
+		assignMotorPower(findHoldingPower(), computeMovementPower());
+		giveReadouts();
+	}
+
+	public void performMainProcessing(double setPoint) {
+		armSetpoint = setPoint;
 		assignMotorPower(findHoldingPower(), computeMovementPower());
 		giveReadouts();
 	}
