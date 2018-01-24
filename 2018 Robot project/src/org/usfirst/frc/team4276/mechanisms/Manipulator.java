@@ -1,8 +1,8 @@
 package org.usfirst.frc.team4276.mechanisms;
 
+import org.usfirst.frc.team4276.utilities.Toggler;
+
 import edu.wpi.first.wpilibj.Solenoid;
-import utilities.Xbox;
-import utilities.Toggler;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Manipulator {

@@ -9,6 +9,13 @@ import mechanisms.*;
 import autonomous.*;
 import static utilities.RoboRioPorts.*;
 
+import org.usfirst.frc.team4276.autonomous.PositionFinder;
+import org.usfirst.frc.team4276.mechanisms.ArmPivoter;
+import org.usfirst.frc.team4276.mechanisms.Climber;
+import org.usfirst.frc.team4276.mechanisms.Elevator;
+import org.usfirst.frc.team4276.mechanisms.Manipulator;
+import org.usfirst.frc.team4276.mechanisms.TeleOpDrive;
+
 public class Robot extends SampleRobot {
 	public static Timer systemTimer;
 	public static Joystick logitechJoystickL;

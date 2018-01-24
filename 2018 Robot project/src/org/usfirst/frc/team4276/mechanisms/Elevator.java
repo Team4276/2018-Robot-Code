@@ -1,12 +1,10 @@
 package org.usfirst.frc.team4276.mechanisms;
 
-import org.usfirst.frc.team4276.robot.Robot;
+import java.awt.Robot;
 
-import utilities.Xbox;
-import edu.wpi.first.wpilibj.smartdashboard.*;
+import org.usfirst.frc.team4276.utilities.Xbox;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Elevator {
 

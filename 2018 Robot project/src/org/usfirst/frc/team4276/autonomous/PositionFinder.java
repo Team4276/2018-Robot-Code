@@ -1,9 +1,10 @@
 package org.usfirst.frc.team4276.autonomous;
 
+import org.usfirst.frc.team4276.mechanisms.ADIS16448_IMU;
+
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.NetworkTable;
-import mechanisms.ADIS16448_IMU;
 
 public class PositionFinder extends Thread implements Runnable {
 
