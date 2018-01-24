@@ -1,4 +1,4 @@
-package utilities;
+package org.usfirst.frc.team4276.utilities;
 
 import org.usfirst.frc.team4276.robot.Robot;
 

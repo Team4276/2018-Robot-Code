@@ -1,4 +1,4 @@
-package mechanisms;
+package org.usfirst.frc.team4276.mechanisms;
 
 import edu.wpi.first.wpilibj.Solenoid;
 import utilities.Xbox;

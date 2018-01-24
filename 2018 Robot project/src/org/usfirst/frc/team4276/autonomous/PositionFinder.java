@@ -1,4 +1,4 @@
-package autonomous;
+package org.usfirst.frc.team4276.autonomous;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;

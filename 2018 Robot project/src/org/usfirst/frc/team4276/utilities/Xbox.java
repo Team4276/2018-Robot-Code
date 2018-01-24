@@ -1,5 +1,5 @@
 
-package utilities;
+package org.usfirst.frc.team4276.utilities;
 
 public class Xbox {
 

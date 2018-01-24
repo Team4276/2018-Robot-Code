@@ -1,4 +1,4 @@
-package mechanisms;
+package org.usfirst.frc.team4276.mechanisms;
 
 import org.usfirst.frc.team4276.robot.Robot;
 

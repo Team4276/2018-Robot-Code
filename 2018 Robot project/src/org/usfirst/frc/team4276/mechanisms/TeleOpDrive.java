@@ -1,4 +1,4 @@
-package mechanisms;
+package org.usfirst.frc.team4276.mechanisms;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
