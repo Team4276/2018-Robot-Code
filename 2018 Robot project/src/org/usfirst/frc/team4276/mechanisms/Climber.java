@@ -1,8 +1,9 @@
 package org.usfirst.frc.team4276.mechanisms;
-
-import java.awt.Robot;
-
+import org.usfirst.frc.team4276.robot.Robot;
 import org.usfirst.frc.team4276.utilities.Xbox;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 public class Climber {
 	VictorSPX climberMotor1, climberMotor2;
