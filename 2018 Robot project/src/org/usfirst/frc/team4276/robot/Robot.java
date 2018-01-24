@@ -11,7 +11,7 @@ import org.usfirst.frc.team4276.mechanisms.ArmPivoter;
 import org.usfirst.frc.team4276.mechanisms.Climber;
 import org.usfirst.frc.team4276.mechanisms.Elevator;
 import org.usfirst.frc.team4276.mechanisms.Manipulator;
-import org.usfirst.frc.team4276.mechanisms.TeleOpDrive;
+import org.usfirst.frc.team4276.mechanisms.DriveTrain;
 import org.usfirst.frc.team4276.utilities.RoboRioPorts;
 
 public class Robot extends SampleRobot {
@@ -20,7 +20,7 @@ public class Robot extends SampleRobot {
 	public static Joystick logitechJoystickR;
 	public static Joystick xboxController;
 
-	TeleOpDrive robotTankDrive;
+	DriveTrain robotTankDrive;
 	Climber robotClimber;
 	Elevator robotElevator;
 	Manipulator cubeManipulator;
@@ -44,7 +44,7 @@ public class Robot extends SampleRobot {
 
 		// Mechanisms
 
-		robotTankDrive = new TeleOpDrive(RoboRioPorts.DRIVE_DOUBLE_SOLENOID_FWD, RoboRioPorts.DRIVE_DOUBLE_SOLENOID_REV, RoboRioPorts.CAN_DRIVE_L1,
+		robotTankDrive = new DriveTrain(RoboRioPorts.DRIVE_DOUBLE_SOLENOID_FWD, RoboRioPorts.DRIVE_DOUBLE_SOLENOID_REV, RoboRioPorts.CAN_DRIVE_L1,
 				RoboRioPorts.CAN_DRIVE_R1, RoboRioPorts.CAN_DRIVE_L2, RoboRioPorts.CAN_DRIVE_R2, RoboRioPorts.CAN_DRIVE_L3, RoboRioPorts.CAN_DRIVE_R3);
 
 		robotClimber = new Climber(RoboRioPorts.CAN_CLIMBER1, RoboRioPorts.CAN_CLIMBER2);

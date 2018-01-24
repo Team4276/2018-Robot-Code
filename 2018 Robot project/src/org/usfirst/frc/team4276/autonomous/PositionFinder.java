@@ -14,6 +14,7 @@ public class PositionFinder extends Thread implements Runnable {
 	private double[] previousXY = new double[2];
 	private double[] coordinates = new double[2];
 
+
 	public PositionFinder(int encoder1A, int encoder1B, int encoder2A, int encoder2B) {
 
 		placeholderLeft = new Encoder(encoder1A, encoder1B);
@@ -23,7 +24,7 @@ public class PositionFinder extends Thread implements Runnable {
 
 	}
 
-	private double getHeading() {
+	public double getHeading() {
 		double theta = -1 * robotIMU.getYaw();
 		return theta;
 	}
@@ -70,6 +71,7 @@ public class PositionFinder extends Thread implements Runnable {
 			coordinates[1] = previousXY[1] + findDeltaCoords()[1];
 			previousXY[0] = coordinates[0];
 			previousXY[1] = coordinates[1];
+
 		}
 	}
 }

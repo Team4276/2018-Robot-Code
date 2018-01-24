@@ -26,13 +26,13 @@ public class ArmPivoter {
 	double armSetpoint = -90;
 	double armPositionError = 0;
 	double armPositionErrorLast = 0;
-	double accumulatedError = 0;
-	double rateError = 0;
+	private double accumulatedError = 0;
+	private double rateError = 0;
 
 	boolean initializePID = true;
-	double timeNow;
-	double timePrevious;
-	double timeStep;
+	private double timeNow;
+	private double timePrevious;
+	private double timeStep;
 
 	final double PROPORTIONAL_GAIN = 0;
 	final double INTEGRAL_GAIN = 0;

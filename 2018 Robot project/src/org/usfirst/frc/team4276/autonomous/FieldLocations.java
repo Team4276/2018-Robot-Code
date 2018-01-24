@@ -1,6 +1,6 @@
 package org.usfirst.frc.team4276.autonomous;
 
-public class fieldLocations {
+public class FieldLocations {
 
 	public final double[] leftScaleLocation = new double[] { 27, 19.5 };
 	public final double[] rightScaleLocation = new double[] { 27, 7.5 };
