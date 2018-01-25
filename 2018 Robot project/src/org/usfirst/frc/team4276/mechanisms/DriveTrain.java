@@ -29,8 +29,8 @@ public class DriveTrain {
 	public boolean driveInit;
 
 	private double accumulatedError;
-	private double headingErrorLast = 0;
-	
+	private double errorLast = 0;
+
 	private double timeNow;
 	private double timePrevious;
 	private double timeStep;
@@ -85,17 +85,17 @@ public class DriveTrain {
 	public boolean rotateToHeading(double desiredHeading) {
 		if (driveInit == true) {
 			accumulatedError = 0;
-			headingErrorLast = 0;
+			errorLast = 0;
 		}
 		boolean status = false;
 		double timeStep = Robot.systemTimer.get();
 		double currentHeading = robotLocator.getHeading();
 		double headingErrorCurrent = desiredHeading - currentHeading;
-		accumulatedError = accumulatedError + (headingErrorCurrent + headingErrorLast) * timeStep; // calculates
-																									// integral
-																									// of
-																									// heading
-		double errorRate = (headingErrorCurrent - headingErrorLast) / timeStep; // integral
+		accumulatedError = accumulatedError + (headingErrorCurrent + errorLast) * timeStep; // calculates
+																							// integral
+																							// of
+																							// heading
+		double errorRate = (headingErrorCurrent - errorLast) / timeStep; // integral
 
 		final double PROPORTIONAL_GAIN = .015;
 		final double INTEGRAL_GAIN = 0;
@@ -117,21 +117,21 @@ public class DriveTrain {
 	public boolean rotateToCoordinate(double[] desiredCoordinateFacing) {
 		if (driveInit == true) {
 			accumulatedError = 0;
-			headingErrorLast = 0;
+			errorLast = 0;
 		}
 		double desiredHeading = Math.atan2(desiredCoordinateFacing[0], desiredCoordinateFacing[1]);
 		// calculates heading needed to face coordinates based on inputed array
-		
+
 		boolean status = false;
-		//return status of method (true when has reached target)
-		
+		// return status of method (true when has reached target)
+
 		double timeStep = Robot.systemTimer.get();
 		double currentHeading = robotLocator.getHeading();
 		double headingErrorCurrent = desiredHeading - currentHeading;
-		accumulatedError = accumulatedError + (headingErrorCurrent + headingErrorLast) * timeStep;
-		// calculates integral of heading
-		
-		double errorRate = (headingErrorCurrent - headingErrorLast) / timeStep; // integral
+		accumulatedError = accumulatedError + (headingErrorCurrent + errorLast) * timeStep;
+		// calculates integral of heading error
+
+		double errorRate = (headingErrorCurrent - errorLast) / timeStep; // integral
 
 		final double PROPORTIONAL_GAIN = .015;
 		final double INTEGRAL_GAIN = 0;
@@ -142,6 +142,48 @@ public class DriveTrain {
 		rightDrivePower = -1 * (PROPORTIONAL_GAIN * headingErrorCurrent + INTEGRAL_GAIN * accumulatedError);
 
 		if (Math.abs(headingErrorCurrent) < POSITION_DEADBAND && Math.abs(errorRate) < RATE_DEADBAND) {
+			status = true;
+			leftDrivePower = 0;
+			rightDrivePower = 0;
+		}
+		setMotorSpeeds();
+		return status;
+	}
+
+	public boolean driveToCoordinate(double[] desiredCoordinate) {
+		if (driveInit == true) {
+			accumulatedError = 0;
+			errorLast = 0;
+		}
+		double desiredHeading = Math.atan2(desiredCoordinate[0], desiredCoordinate[1]);
+		// calculates heading needed to face coordinates based on inputed array
+
+		boolean status = false;
+		// return status of method (true when has reached target)
+
+		double timeStep = Robot.systemTimer.get();
+		double errorCurrent = Math.sqrt(Math.pow(desiredCoordinate[0] - robotLocator.coordinates[0], 2)
+				+ Math.pow(desiredCoordinate[1] - robotLocator.coordinates[1], 2));
+
+		double currentHeading = robotLocator.getHeading();
+		double headingError = desiredHeading - currentHeading;
+		accumulatedError = accumulatedError + (errorCurrent + errorLast) * timeStep;
+		// calculates integral of heading error
+
+		double errorRate = (errorCurrent - errorLast) / timeStep; // integral
+
+		final double LINEAR_PROPORTIONAL_GAIN = .1;
+		final double LINEAR_INTEGRAL_GAIN = 0;
+		final double ANGLER_PROPORTIONAL_GAIN = .015; // degrees
+		final double LINEAR_DEADBAND = 0.1; // feet
+		final double LINEAR_RATE_DEADBAND = .5; // feet per second
+
+		leftDrivePower = LINEAR_PROPORTIONAL_GAIN * headingError + LINEAR_INTEGRAL_GAIN * accumulatedError
+				+ ANGLER_PROPORTIONAL_GAIN * headingError;
+		rightDrivePower = LINEAR_PROPORTIONAL_GAIN * headingError + LINEAR_INTEGRAL_GAIN * accumulatedError
+				- ANGLER_PROPORTIONAL_GAIN * headingError;
+
+		if (Math.abs(headingError) < LINEAR_DEADBAND && Math.abs(errorRate) < LINEAR_RATE_DEADBAND) {
 			status = true;
 			leftDrivePower = 0;
 			rightDrivePower = 0;

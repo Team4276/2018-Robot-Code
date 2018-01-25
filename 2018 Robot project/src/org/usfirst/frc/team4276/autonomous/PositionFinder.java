@@ -12,7 +12,7 @@ public class PositionFinder extends Thread implements Runnable {
 	static ADIS16448_IMU robotIMU;
 
 	private double[] previousXY = new double[2];
-	private double[] coordinates = new double[2];
+	public double[] coordinates = new double[2];
 
 
 	public PositionFinder(int encoder1A, int encoder1B, int encoder2A, int encoder2B) {
@@ -69,8 +69,7 @@ public class PositionFinder extends Thread implements Runnable {
 		while (true) {
 			coordinates[0] = previousXY[0] + findDeltaCoords()[0];
 			coordinates[1] = previousXY[1] + findDeltaCoords()[1];
-			previousXY[0] = coordinates[0];
-			previousXY[1] = coordinates[1];
+			previousXY = coordinates;
 
 		}
 	}
