@@ -29,8 +29,8 @@ public class RoboRioPorts {
 	// Example:
 	// static final int DRIVE_DOUBLE_SOLENOID_FWD = 0;
 
-	public static final int DRIVE_DOUBLE_SOLENOID_FWD = 0;
-	public static final int DRIVE_DOUBLE_SOLENOID_REV = 1;
+	public static final int DRIVE_DOUBLE_SOLENOID_FWD = 3;
+	public static final int DRIVE_DOUBLE_SOLENOID_REV = 4;
 
 	public static final int CUBE_MANIPULATOR = 2;
 

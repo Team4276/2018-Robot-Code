@@ -8,6 +8,7 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Timer;
 
 public class DriveTrain {
 
@@ -58,21 +59,27 @@ public class DriveTrain {
 
 	public void getJoystickValues() {
 
-		leftDrivePower = leftJoystick.getY();
-		rightDrivePower = rightJoystick.getY();
+		leftDrivePower = Robot.logitechJoystickL.getY();
+		rightDrivePower = Robot.logitechJoystickR.getY();
 
 	}
 
 	public void checkForGearShift() {
-		boolean shiftHi = rightJoystick.getRawButton(highShifter);
-		boolean shiftLo = rightJoystick.getRawButton(lowShifter);
-		boolean isHi = (gearShifter.get() == DoubleSolenoid.Value.kForward);
-		boolean isLo = (gearShifter.get() == DoubleSolenoid.Value.kReverse);
+		boolean shiftHi = Robot.logitechJoystickR.getRawButton(highShifter);
+		boolean shiftLo = Robot.logitechJoystickR.getRawButton(lowShifter);
 
 		if (shiftHi) {
+			setMotorSpeeds(0);
+			Timer.delay(.01);
 			gearShifter.set(DoubleSolenoid.Value.kForward);
+			Timer.delay(.01);
 		} else if (shiftLo) {
+			setMotorSpeeds(0);
+			Timer.delay(.01);
 			gearShifter.set(DoubleSolenoid.Value.kReverse);
+			Timer.delay(.01);
+		} else {
+			setMotorSpeeds();
 		}
 
 	}
@@ -80,6 +87,11 @@ public class DriveTrain {
 	public void setMotorSpeeds() {
 		leftMotor.set(ControlMode.PercentOutput, leftDrivePower);
 		rightMotor.set(ControlMode.PercentOutput, rightDrivePower);
+	}
+
+	public void setMotorSpeeds(double speed) {
+		leftMotor.set(ControlMode.PercentOutput, speed);
+		rightMotor.set(ControlMode.PercentOutput, speed);
 	}
 
 	public boolean rotateToHeading(double desiredHeading) {
@@ -195,6 +207,5 @@ public class DriveTrain {
 	public void performMainProcessing() {
 		getJoystickValues();
 		checkForGearShift();
-		setMotorSpeeds();
 	}
 }

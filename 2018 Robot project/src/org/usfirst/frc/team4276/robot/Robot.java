@@ -21,10 +21,10 @@ public class Robot extends SampleRobot {
 	public static Joystick xboxController;
 
 	DriveTrain robotTankDrive;
-	Climber robotClimber;
-	Elevator robotElevator;
-	Manipulator cubeManipulator;
-	ArmPivoter robotArmPivoter;
+	//Climber robotClimber;
+	//Elevator robotElevator;
+	//Manipulator cubeManipulator;
+	//ArmPivoter robotArmPivoter;
 	PositionFinder robotPositioningSystem;
 
 	public Robot() {
@@ -39,29 +39,29 @@ public class Robot extends SampleRobot {
 
 		// Autonomous
 
-		robotPositioningSystem = new PositionFinder(RoboRioPorts.DIO_DRIVE_LEFT_A, RoboRioPorts.DIO_DRIVE_LEFT_B, RoboRioPorts.DIO_DRIVE_RIGHT_A,
-				RoboRioPorts.DIO_DRIVE_RIGHT_B);
+		//robotPositioningSystem = new PositionFinder(RoboRioPorts.DIO_DRIVE_LEFT_A, RoboRioPorts.DIO_DRIVE_LEFT_B, RoboRioPorts.DIO_DRIVE_RIGHT_A,
+		//		RoboRioPorts.DIO_DRIVE_RIGHT_B);
 
 		// Mechanisms
 
 		robotTankDrive = new DriveTrain(robotPositioningSystem, RoboRioPorts.DRIVE_DOUBLE_SOLENOID_FWD, RoboRioPorts.DRIVE_DOUBLE_SOLENOID_REV, RoboRioPorts.CAN_DRIVE_L1,
 				RoboRioPorts.CAN_DRIVE_R1, RoboRioPorts.CAN_DRIVE_L2, RoboRioPorts.CAN_DRIVE_R2, RoboRioPorts.CAN_DRIVE_L3, RoboRioPorts.CAN_DRIVE_R3);
 
-		robotClimber = new Climber(RoboRioPorts.CAN_CLIMBER1, RoboRioPorts.CAN_CLIMBER2);
+		//robotClimber = new Climber(RoboRioPorts.CAN_CLIMBER1, RoboRioPorts.CAN_CLIMBER2);
 
-		robotElevator = new Elevator(RoboRioPorts.CAN_RAIL_DRIVER1, RoboRioPorts.CAN_RAIL_DRIVER2);
-		robotArmPivoter = new ArmPivoter(RoboRioPorts.CAN_ARM_PIVOT);
-		cubeManipulator = new Manipulator(RoboRioPorts.CUBE_MANIPULATOR);
+		//robotElevator = new Elevator(RoboRioPorts.CAN_RAIL_DRIVER1, RoboRioPorts.CAN_RAIL_DRIVER2);
+		//robotArmPivoter = new ArmPivoter(RoboRioPorts.CAN_ARM_PIVOT);
+		//cubeManipulator = new Manipulator(RoboRioPorts.CUBE_MANIPULATOR);
 
 		// Threads
 
-		robotPositioningSystem.start();
+		//robotPositioningSystem.start();
 
 	}
 
 	public void robotInit() {
 
-		robotArmPivoter.performMainProcessing(-90);
+		//robotArmPivoter.performMainProcessing(-90);
 	}
 
 	public void autonomous() {
@@ -72,7 +72,7 @@ public class Robot extends SampleRobot {
 
 		while (isOperatorControl() && isEnabled()) {
 
-			// robotTankDrive.performMainProcessing();
+			robotTankDrive.performMainProcessing();
 			// robotClimber.performMainProcessing();
 			// robotArmPivoter.performMainProcessing();
 			// cubeManipulator.performMainProcessing();

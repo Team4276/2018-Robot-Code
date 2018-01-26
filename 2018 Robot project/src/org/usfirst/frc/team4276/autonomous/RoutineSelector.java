@@ -4,9 +4,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team4276.robot.Robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
-public class RoutineSelector {
+public class RoutineSelector extends Thread implements Runnable {
 
 	SendableChooser<Integer> selectionModeChooser;
 	SendableChooser<Integer> startPosition;
@@ -29,10 +30,15 @@ public class RoutineSelector {
 	private final int SCORE_SCALE = 2;
 	private String[] strategyArray = new String[3];
 
+	private final int LEFT_PLATFORM = 0;
+	private final int RIGHT_PLATFORM = 1;
+	private String[] scoringPlatformArray = new String[3];
+
 	private int selectionMode = COMMIT_MODE;
 	static int startingPosition = 0;
 	static int strategy = 0;
 	static int autoModeToExecute;
+	String gameData = DriverStation.getInstance().getGameSpecificMessage();
 
 	public RoutineSelector() {
 		selectionModeArray[COMMIT_MODE] = "Commit mode";
@@ -64,33 +70,45 @@ public class RoutineSelector {
 		SmartDashboard.putData("Selected Strategy", strategyChooser);
 
 	}
-	
+
 	public void run() {
-		try{
-		while (true) {
-			if (selectionMode == COMMIT_MODE) {
-				selectionMode = (int) selectionModeChooser.getSelected();
-			} else {
-				selectionMode = (int) selectionModeChooser.getSelected();
-				startingPosition = (int) startPosition.getSelected();
-				strategy = (int) strategyChooser.getSelected();
-				autoModeToExecute = strategy + startingPosition;
+		try {
+			while (true) {
+				if (selectionMode == COMMIT_MODE) {
+					selectionMode = (int) selectionModeChooser.getSelected();
+				} else {
+					selectionMode = (int) selectionModeChooser.getSelected();
+					startingPosition = (int) startPosition.getSelected();
+					strategy = (int) strategyChooser.getSelected();
+					autoModeToExecute = strategy + startingPosition;
+				}
+
+				if (gameData.charAt(0) == 'L')
+					;
+				else
+					;
+				if (gameData.charAt(1) == 'L')
+					;
+				else
+					;
+				if (gameData.charAt(2) == 'L')
+					;
+				else
+					;
+
+				SmartDashboard.putString("Selection mode", selectionModeArray[selectionMode]);
+				SmartDashboard.putString("Alliance color", startPositionArray[startingPosition]);
+				SmartDashboard.putString("Auto mode", strategyArray[strategy]);
+				SmartDashboard.putNumber("Auto", autoModeToExecute);
+
+				Robot.systemTimer.delay(0.1);
+				SmartDashboard.putBoolean("AutoSelector Error", false);
 			}
-			SmartDashboard.putString("Selection mode", selectionModeArray[selectionMode]);
-			SmartDashboard.putString("Alliance color", startPositionArray[startingPosition]);
-			SmartDashboard.putString("Auto mode", strategyArray[strategy]);
-			SmartDashboard.putNumber("Auto", autoModeToExecute);
-			
-			Robot.systemTimer.delay(0.1);
-			SmartDashboard.putBoolean("AutoSelector Error", false);
-		}
-		}
-		catch(Exception autoSelectorError)
-		{
+		} catch (Exception autoSelectorError) {
 
 			SmartDashboard.putBoolean("AutoSelector Error", true);
 			SmartDashboard.putString("Auto ERROR", autoSelectorError.getMessage());
 		}
-		
+
 	}
 }
