@@ -6,11 +6,11 @@ public class SoftwareTimer {
 
 	private double expirationTime;
 
-	void setTimer(double timerValue) {
+	public void setTimer(double timerValue) {
 		expirationTime = Robot.systemTimer.get() + timerValue;
 	}
 
-	boolean isExpired() {
+	public boolean isExpired() {
 		return (Robot.systemTimer.get() > expirationTime);
 		// if robotTime exceeds expirationTime, then this returns true
 	}

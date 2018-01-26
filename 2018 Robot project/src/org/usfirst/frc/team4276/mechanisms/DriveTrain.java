@@ -2,13 +2,13 @@ package org.usfirst.frc.team4276.mechanisms;
 
 import org.usfirst.frc.team4276.autonomous.PositionFinder;
 import org.usfirst.frc.team4276.robot.Robot;
+import org.usfirst.frc.team4276.utilities.SoftwareTimer;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Timer;
 
 public class DriveTrain {
 
@@ -21,11 +21,16 @@ public class DriveTrain {
 	VictorSPX rightMotorFollower1;
 	VictorSPX leftMotorFollower2;
 	VictorSPX rightMotorFollower2;
+
 	PositionFinder robotLocator;
+	SoftwareTimer shiftTimer;
+
+	private boolean shiftInit = true;
 
 	public double leftDrivePower, rightDrivePower;
 	public int highShifter = 4;
 	public int lowShifter = 3;
+	public final double SHIFT_TIME = .05;
 
 	public boolean driveInit;
 
@@ -69,15 +74,29 @@ public class DriveTrain {
 		boolean shiftLo = Robot.logitechJoystickR.getRawButton(lowShifter);
 
 		if (shiftHi) {
-			setMotorSpeeds(0);
-			Timer.delay(.01);
+			if (shiftInit) {
+				shiftTimer.setTimer(SHIFT_TIME);
+				shiftInit = false;
+			}
+			if (shiftTimer.isExpired()) {
+				setMotorSpeeds();
+				shiftInit = true;
+			} else {
+				setMotorSpeeds(0);
+			}
 			gearShifter.set(DoubleSolenoid.Value.kForward);
-			Timer.delay(.01);
 		} else if (shiftLo) {
-			setMotorSpeeds(0);
-			Timer.delay(.01);
+			if (shiftInit) {
+				shiftTimer.setTimer(SHIFT_TIME);
+				shiftInit = false;
+			}
+			if (shiftTimer.isExpired()) {
+				setMotorSpeeds();
+				shiftInit = true;
+			} else {
+				setMotorSpeeds(0);
+			}
 			gearShifter.set(DoubleSolenoid.Value.kReverse);
-			Timer.delay(.01);
 		} else {
 			setMotorSpeeds();
 		}
