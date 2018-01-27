@@ -1,4 +1,4 @@
-package org.usfirst.frc.team4276.mechanisms;
+package org.usfirst.frc.team4276.systems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -29,7 +29,8 @@ public class ArmPivoter {
 	private double accumulatedError = 0;
 	private double rateError = 0;
 
-	boolean initializePID = true;
+	private boolean manualOveride = false;
+	private boolean initializePID = true;
 	private double timeNow;
 	private double timePrevious;
 	private double timeStep;
@@ -104,12 +105,17 @@ public class ArmPivoter {
 
 	public void findSetpoint() {
 
-		if (Robot.xboxController.getRawButton(Xbox.X)) {
+		if (Robot.xboxController.getRawButton(Xbox.Start)
+				&& (Math.abs(Robot.xboxController.getRawAxis(Xbox.LAxisY)) > .075)) {
+			manualOveride = true;
+		} else if (Robot.xboxController.getRawButton(Xbox.X)) {
+			manualOveride = false;
 			armSetpoint = 0;
 		} else {
-			if (Xbox.LAxisY > .5) {
+			manualOveride = false;
+			if (Robot.xboxController.getRawAxis(Xbox.LAxisY) > .5) {
 				armSetpoint++;
-			} else if (Xbox.LAxisY < -.5) {
+			} else if (Robot.xboxController.getRawAxis(Xbox.LAxisY) < -.5) {
 				armSetpoint--;
 			}
 		}
@@ -122,6 +128,11 @@ public class ArmPivoter {
 	}
 
 	public void assignMotorPower(double staticPower, double activePower) {
+		if (manualOveride) {
+
+		} else {
+			pivotMotor.set(ControlMode.PercentOutput, Robot.xboxController.getRawAxis(Xbox.LAxisY));
+		}
 		pivotMotor.set(ControlMode.PercentOutput, (staticPower + activePower));
 	}
 
