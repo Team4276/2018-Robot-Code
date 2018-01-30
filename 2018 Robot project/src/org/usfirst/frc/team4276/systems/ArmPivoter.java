@@ -153,4 +153,8 @@ public class ArmPivoter {
 		giveReadouts();
 	}
 
+	public void updateTelemetry() {
+		SmartDashboard.putNumber("Arm Angle:", armPosition);
+	}
+
 }

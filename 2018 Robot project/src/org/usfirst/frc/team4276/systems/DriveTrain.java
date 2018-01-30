@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveTrain {
 
@@ -40,6 +41,8 @@ public class DriveTrain {
 	private double timeNow;
 	private double timePrevious;
 	private double timeStep;
+	
+	public String driveMode = "init";
 
 	public DriveTrain(PositionFinder robotPF, int shifterAPort, int shifterBPort, int leftCANPort, int rightCANPort,
 			int leftCANPort1, int rightCANPort1, int leftCANPort2, int rightCANPort2) {
@@ -142,6 +145,7 @@ public class DriveTrain {
 			rightDrivePower = 0;
 		}
 		setMotorSpeeds();
+		driveMode = "Rotating to: " + desiredHeading;
 		return status;
 	}
 
@@ -178,6 +182,7 @@ public class DriveTrain {
 			rightDrivePower = 0;
 		}
 		setMotorSpeeds();
+		driveMode = "Pointing to: " + desiredCoordinateFacing[0] + "," + desiredCoordinateFacing[1];
 		return status;
 	}
 
@@ -220,11 +225,22 @@ public class DriveTrain {
 			rightDrivePower = 0;
 		}
 		setMotorSpeeds();
+		driveMode = "Driving to: " + desiredCoordinate[0] + "," + desiredCoordinate[1];
 		return status;
 	}
 
 	public void performMainProcessing() {
 		getJoystickValues();
 		checkForGearShift();
+		driveMode = "Operator Control";
+	}
+
+	public void updateTelemetry() {
+		SmartDashboard.putBoolean("High Gear", Robot.logitechJoystickR.getRawButton(highShifter));
+		SmartDashboard.putBoolean("Low Gear", Robot.logitechJoystickR.getRawButton(lowShifter));
+		SmartDashboard.putBoolean("Shifting In Progress", !shiftTimer.isExpired());
+		SmartDashboard.putNumber("Left Drive Power", leftDrivePower);
+		SmartDashboard.putNumber("Right Drive Power", rightDrivePower);
+		SmartDashboard.putString("Drive Mode", driveMode);
 	}
 }

@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Climber {
 	VictorSPX climberMotor1, climberMotor2;
 	final double MOTOR_POWER = 1;
-	boolean climbInProgress = 0;
+	boolean climbInProgress = false;
 
 	public Climber(int canPort1, int canPort2) {
 		climberMotor1 = new VictorSPX(canPort1);
