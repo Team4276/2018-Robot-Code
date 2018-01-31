@@ -24,21 +24,25 @@ public class Elevator {
 	final double SETPOINT_SWITCH = 3;
 	final double SETPOINT_BOTTOM = 1;
 	final double SETPOINT_INCREMENT = .05;
-
+	final double HEIGHT_PER_PULSE = 1;
+	
 	private boolean manualOveride;
 	private boolean initializePID = true;
 	private double timeNow;
 	private double timePrevious;
 	private double timeStep;
-
+	private double accumulatedError; 
+	private double rateError = 0;
+	
 	double estimatedHeight = 0;
 	double commandedHeight = 0;
 	double heightError = 0;
 	double motorPower;
 	double assignedPower;
-
-	final double initiliazedPoint = 0;
-	final double derivativePoint = 0;
+	double heightErrorLast = 0;
+	
+	final double INITIALIZED_POINT = 0;
+	final double DERIVATIVE_POINT = 0;
 
 	public Elevator(int elevator1CANPort, int elevator2CANPort) {
 
@@ -88,7 +92,37 @@ public class Elevator {
 		} else if (commandedHeight > SETPOINT_BOTTOM) {
 			commandedHeight = SETPOINT_BOTTOM;
 		}
-
+		
+		if (initializePID == true) {
+			timeNow = Robot.systemTimer.get();
+			estimatedHeight = elevatorDriverMain.getSensorCollection().getQuadraturePosition() * HEIGHT_PER_PULSE;
+			heightError = commandedHeight - estimatedHeight; 
+			accumulatedError = 0.0;
+			motorPower = 0.0;
+			initializePID = false; 
+		} else {
+			heightErrorLast = heightError;
+			timePrevious = timeNow;
+			timeNow = Robot.systemTimer.get();
+			estimatedHeight = elevatorDriverMain.getSensorCollection().getQuadraturePosition() * HEIGHT_PER_PULSE;	
+			timeStep = timeNow - timePrevious;
+			
+			
+			heightError = commandedHeight - estimatedHeight; 
+			accumulatedError = accumulatedError + ((heightErrorLast + heightError) / 2) * timeStep;
+			
+			
+			
+			rateError = -elevatorDriverMain.getSensorCollection().getQuadratureVelocity() * HEIGHT_PER_PULSE * 10;
+			
+			//motorPower = p
+			//This is where i left off
+			
+		}
+		
+		
+	
+		
 		// PID control
 		if (commandedHeight < MANIPULATOR_RAIL_HEIGHT) {
 			// PID for manipulator rail
