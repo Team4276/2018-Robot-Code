@@ -19,16 +19,16 @@ public class RoutineSelector extends Thread implements Runnable {
 	private String[] selectionModeArray = new String[2];
 
 	// Starting positions
-	private final int LEFT = 0;
-	private final int CENTER = 1;
-	private final int RIGHT = 2;
-	private String[] startPositionArray = new String[3];
+	static final int LEFT = 0;
+	static final int CENTER = 1;
+	static final int RIGHT = 2;
+	static String[] startPositionArray = new String[3];
 
 	// Starting positions
-	private final int CROSS_BASE = 0;
-	private final int SCORE_SWITCH = 1;
-	private final int SCORE_SCALE = 2;
-	private String[] strategyArray = new String[3];
+	// private final int CROSS_BASE = 0;
+	// private final int SCORE_SWITCH = 1;
+	// private final int SCORE_SCALE = 2;
+	// private String[] strategyArray = new String[3];
 
 	private final int LEFT_PLATFORM = 0;
 	private final int RIGHT_PLATFORM = 1;
@@ -38,7 +38,6 @@ public class RoutineSelector extends Thread implements Runnable {
 	static int startingPosition = 0;
 	static int strategy = 0;
 	static int autoModeToExecute;
-	String gameData = DriverStation.getInstance().getGameSpecificMessage();
 
 	public RoutineSelector() {
 		selectionModeArray[COMMIT_MODE] = "Commit mode";
@@ -48,9 +47,9 @@ public class RoutineSelector extends Thread implements Runnable {
 		startPositionArray[CENTER] = "center";
 		startPositionArray[RIGHT] = "right";
 
-		strategyArray[CROSS_BASE] = "cross base";
-		strategyArray[SCORE_SWITCH] = "score switch";
-		strategyArray[SCORE_SCALE] = "score scale";
+		// strategyArray[CROSS_BASE] = "cross base";
+		// strategyArray[SCORE_SWITCH] = "score switch";
+		// strategyArray[SCORE_SCALE] = "score scale";
 
 		selectionModeChooser = new SendableChooser<Integer>();
 		selectionModeChooser.addDefault(selectionModeArray[COMMIT_MODE], COMMIT_MODE);
@@ -63,11 +62,14 @@ public class RoutineSelector extends Thread implements Runnable {
 		startPosition.addObject(startPositionArray[RIGHT], RIGHT);
 		SmartDashboard.putData("Starting Position", startPosition);
 
-		strategyChooser = new SendableChooser<Integer>();
-		strategyChooser.addDefault(startPositionArray[CROSS_BASE], CROSS_BASE);
-		strategyChooser.addObject(startPositionArray[SCORE_SWITCH], SCORE_SWITCH);
-		strategyChooser.addObject(startPositionArray[SCORE_SCALE], SCORE_SCALE);
-		SmartDashboard.putData("Selected Strategy", strategyChooser);
+		// strategyChooser = new SendableChooser<Integer>();
+		// strategyChooser.addDefault(startPositionArray[CROSS_BASE],
+		// CROSS_BASE);
+		// strategyChooser.addObject(startPositionArray[SCORE_SWITCH],
+		// SCORE_SWITCH);
+		// strategyChooser.addObject(startPositionArray[SCORE_SCALE],
+		// SCORE_SCALE);
+		// SmartDashboard.putData("Selected Strategy", strategyChooser);
 
 	}
 
@@ -79,27 +81,15 @@ public class RoutineSelector extends Thread implements Runnable {
 				} else {
 					selectionMode = (int) selectionModeChooser.getSelected();
 					startingPosition = (int) startPosition.getSelected();
-					strategy = (int) strategyChooser.getSelected();
-					autoModeToExecute = strategy + startingPosition;
+					// strategy = (int)
+					// strategyChooser.getSelectedautoModeToExecute =
+					// startingPosition;
 				}
 
-				if (gameData.charAt(0) == 'L')
-					;
-				else
-					;
-				if (gameData.charAt(1) == 'L')
-					;
-				else
-					;
-				if (gameData.charAt(2) == 'L')
-					;
-				else
-					;
-
 				SmartDashboard.putString("Selection mode", selectionModeArray[selectionMode]);
-				SmartDashboard.putString("Alliance color", startPositionArray[startingPosition]);
-				SmartDashboard.putString("Auto mode", strategyArray[strategy]);
-				SmartDashboard.putNumber("Auto", autoModeToExecute);
+				SmartDashboard.putString("Starting Position", startPositionArray[startingPosition]);
+				// SmartDashboard.putString("Auto mode",
+				// strategyArray[strategy]);
 
 				Robot.systemTimer.delay(0.1);
 				SmartDashboard.putBoolean("AutoSelector Error", false);

@@ -41,7 +41,7 @@ public class DriveTrain {
 	private double timeNow;
 	private double timePrevious;
 	private double timeStep;
-	
+
 	public String driveMode = "init";
 
 	public DriveTrain(PositionFinder robotPF, int shifterAPort, int shifterBPort, int leftCANPort, int rightCANPort,
@@ -191,7 +191,8 @@ public class DriveTrain {
 			accumulatedError = 0;
 			errorLast = 0;
 		}
-		double desiredHeading = Math.atan2(desiredCoordinate[0], desiredCoordinate[1]);
+		double desiredHeading = Math.atan2(desiredCoordinate[1] - robotLocator.getCurrentLocation()[1],
+				desiredCoordinate[0] - robotLocator.getCurrentLocation()[0]);
 		// calculates heading needed to face coordinates based on inputed array
 
 		boolean status = false;
@@ -213,13 +214,19 @@ public class DriveTrain {
 		final double ANGLER_PROPORTIONAL_GAIN = .015; // degrees
 		final double LINEAR_DEADBAND = 0.1; // feet
 		final double LINEAR_RATE_DEADBAND = .5; // feet per second
+		if (Math.abs(headingError) < 90) {
+			leftDrivePower = LINEAR_PROPORTIONAL_GAIN * errorCurrent + LINEAR_INTEGRAL_GAIN * accumulatedError
+					+ ANGLER_PROPORTIONAL_GAIN * headingError;
+			rightDrivePower = LINEAR_PROPORTIONAL_GAIN * errorCurrent + LINEAR_INTEGRAL_GAIN * accumulatedError
+					- ANGLER_PROPORTIONAL_GAIN * headingError;
+		} else if (Math.abs(headingError) > 90) {
+			leftDrivePower = -1 * LINEAR_PROPORTIONAL_GAIN * headingError + LINEAR_INTEGRAL_GAIN * accumulatedError
+					+ ANGLER_PROPORTIONAL_GAIN * headingError;
+			rightDrivePower = -1 * LINEAR_PROPORTIONAL_GAIN * headingError + LINEAR_INTEGRAL_GAIN * accumulatedError
+					- ANGLER_PROPORTIONAL_GAIN * headingError;
+		}
 
-		leftDrivePower = LINEAR_PROPORTIONAL_GAIN * headingError + LINEAR_INTEGRAL_GAIN * accumulatedError
-				+ ANGLER_PROPORTIONAL_GAIN * headingError;
-		rightDrivePower = LINEAR_PROPORTIONAL_GAIN * headingError + LINEAR_INTEGRAL_GAIN * accumulatedError
-				- ANGLER_PROPORTIONAL_GAIN * headingError;
-
-		if (Math.abs(headingError) < LINEAR_DEADBAND && Math.abs(errorRate) < LINEAR_RATE_DEADBAND) {
+		if (Math.abs(errorCurrent) < LINEAR_DEADBAND && Math.abs(errorRate) < LINEAR_RATE_DEADBAND) {
 			status = true;
 			leftDrivePower = 0;
 			rightDrivePower = 0;
