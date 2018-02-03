@@ -49,7 +49,7 @@ public class Robot extends SampleRobot {
 
 		robotCameraSystem = new Cameras();
 
-		robotTankDrive = new DriveTrain(robotPositioningSystem, RoboRioPorts.DRIVE_DOUBLE_SOLENOID_FWD,
+		robotTankDrive = new DriveTrain(RoboRioPorts.DRIVE_DOUBLE_SOLENOID_FWD,
 				RoboRioPorts.DRIVE_DOUBLE_SOLENOID_REV, RoboRioPorts.CAN_DRIVE_L1, RoboRioPorts.CAN_DRIVE_R1,
 				RoboRioPorts.CAN_DRIVE_L2, RoboRioPorts.CAN_DRIVE_R2, RoboRioPorts.CAN_DRIVE_L3,
 				RoboRioPorts.CAN_DRIVE_R3);

@@ -3,39 +3,32 @@ package org.usfirst.frc.team4276.systems;
 import org.usfirst.frc.team4276.utilities.Toggler;
 import org.usfirst.frc.team4276.utilities.Xbox;
 
-import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Manipulator {
-	Solenoid solenoid;
+	DoubleSolenoid grabberSolenoid;
 	Toggler rtToggler;
 	final double TRIGGER_THRESHOLD = -0.5;
 	boolean manipulatorCommandedOpen;
-	boolean solenoidIsOpen;
 
-	public Manipulator(int canPort) {
-		solenoid = new Solenoid(canPort);
+	final DoubleSolenoid.Value CLOSED = DoubleSolenoid.Value.kReverse;
+	final DoubleSolenoid.Value OPEN = DoubleSolenoid.Value.kForward;
+	DoubleSolenoid.Value currentState = null;
+
+	public Manipulator(int PCMPort1, int PCMPort2) {
+		grabberSolenoid = new DoubleSolenoid(PCMPort1, PCMPort2);
 		rtToggler = new Toggler(Xbox.RT);
 	}
 
 	public void openManipulator() {
-		// get current solenoid status
-		solenoidIsOpen = solenoid.get();
-
-		// if solenoid is not(!) open, then open it
-		if (!solenoidIsOpen) {
-			solenoid.set(true);
-		}
+		currentState = (OPEN);
+		updateMechanismState();
 	}
 
 	public void closeManipulator() {
-		// get current solenoid status
-		solenoidIsOpen = solenoid.get();
-
-		// if solenoid is open, then close it
-		if (solenoidIsOpen) {
-			solenoid.set(false);
-		}
+		currentState = (CLOSED);
+		updateMechanismState();
 	}
 
 	public void performMainProcessing() {
@@ -44,11 +37,19 @@ public class Manipulator {
 		manipulatorCommandedOpen = rtToggler.getMechanismState();
 
 		// open or close solenoid depending on desired manipulator position
-		solenoid.set(manipulatorCommandedOpen);
+		if (manipulatorCommandedOpen) {
+			currentState = OPEN;
+		} else {
+			currentState = CLOSED;
+		}
+		updateMechanismState();
+	}
+
+	public void updateMechanismState() {
+		grabberSolenoid.set(currentState);
 	}
 
 	public void updateTelemetry() {
-		solenoidIsOpen = solenoid.get();
-		SmartDashboard.putBoolean("manipulator open", solenoidIsOpen);
+		SmartDashboard.putBoolean("manipulator open", manipulatorCommandedOpen);
 	}
 }

@@ -23,7 +23,6 @@ public class DriveTrain {
 	VictorSPX leftMotorFollower2;
 	VictorSPX rightMotorFollower2;
 
-	PositionFinder robotLocator;
 	SoftwareTimer shiftTimer;
 
 	private boolean shiftInit = true;
@@ -44,10 +43,8 @@ public class DriveTrain {
 
 	public String driveMode = "init";
 
-	public DriveTrain(PositionFinder robotPF, int shifterAPort, int shifterBPort, int leftCANPort, int rightCANPort,
-			int leftCANPort1, int rightCANPort1, int leftCANPort2, int rightCANPort2) {
-
-		robotLocator = robotPF;
+	public DriveTrain(int shifterAPort, int shifterBPort, int leftCANPort, int rightCANPort, int leftCANPort1,
+			int rightCANPort1, int leftCANPort2, int rightCANPort2) {
 
 		leftMotor = new VictorSPX(leftCANPort);
 		rightMotor = new VictorSPX(rightCANPort);
@@ -123,7 +120,7 @@ public class DriveTrain {
 		}
 		boolean status = false;
 		double timeStep = Robot.systemTimer.get();
-		double currentHeading = robotLocator.getHeading();
+		double currentHeading = PositionFinder.getHeadingDeg();
 		double headingErrorCurrent = desiredHeading - currentHeading;
 		accumulatedError = accumulatedError + (headingErrorCurrent + errorLast) * timeStep; // calculates
 																							// integral
@@ -153,15 +150,18 @@ public class DriveTrain {
 		if (driveInit == true) {
 			accumulatedError = 0;
 			errorLast = 0;
+			timeNow = Robot.systemTimer.get();
 		}
-		double desiredHeading = Math.atan2(desiredCoordinateFacing[0], desiredCoordinateFacing[1]);
+		double desiredHeading = Math.atan2(desiredCoordinateFacing[1], desiredCoordinateFacing[0]);
 		// calculates heading needed to face coordinates based on inputed array
 
 		boolean status = false;
 		// return status of method (true when has reached target)
 
-		double timeStep = Robot.systemTimer.get();
-		double currentHeading = robotLocator.getHeading();
+		timePrevious = timeNow;
+		timeNow = Robot.systemTimer.get();
+		double currentHeading = PositionFinder.getHeadingDeg();
+		timeStep = timeNow - timePrevious;
 		double headingErrorCurrent = desiredHeading - currentHeading;
 		accumulatedError = accumulatedError + (headingErrorCurrent + errorLast) * timeStep;
 		// calculates integral of heading error
@@ -190,19 +190,22 @@ public class DriveTrain {
 		if (driveInit == true) {
 			accumulatedError = 0;
 			errorLast = 0;
+			timeNow = Robot.systemTimer.get();
 		}
-		double desiredHeading = Math.atan2(desiredCoordinate[1] - robotLocator.getCurrentLocation()[1],
-				desiredCoordinate[0] - robotLocator.getCurrentLocation()[0]);
+		double desiredHeading = Math.atan2(desiredCoordinate[1] - PositionFinder.getCurrentLocation()[1],
+				desiredCoordinate[0] - PositionFinder.getCurrentLocation()[0]);
 		// calculates heading needed to face coordinates based on inputed array
 
 		boolean status = false;
 		// return status of method (true when has reached target)
 
-		double timeStep = Robot.systemTimer.get();
-		double errorCurrent = Math.sqrt(Math.pow(desiredCoordinate[0] - robotLocator.coordinates[0], 2)
-				+ Math.pow(desiredCoordinate[1] - robotLocator.coordinates[1], 2));
+		timePrevious = timeNow;
+		timeNow = Robot.systemTimer.get();
+		double errorCurrent = Math.sqrt(Math.pow(desiredCoordinate[0] - PositionFinder.currentXY[0], 2)
+				+ Math.pow(desiredCoordinate[1] - PositionFinder.currentXY[1], 2));
+		timeStep = timeNow - timePrevious;
 
-		double currentHeading = robotLocator.getHeading();
+		double currentHeading = PositionFinder.getHeadingDeg();
 		double headingError = desiredHeading - currentHeading;
 		accumulatedError = accumulatedError + (errorCurrent + errorLast) * timeStep;
 		// calculates integral of heading error
@@ -214,12 +217,15 @@ public class DriveTrain {
 		final double ANGLER_PROPORTIONAL_GAIN = .015; // degrees
 		final double LINEAR_DEADBAND = 0.1; // feet
 		final double LINEAR_RATE_DEADBAND = .5; // feet per second
-		if (Math.abs(headingError) < 90) {
+
+		boolean facingTarget = (Math.abs(headingError) < 90);
+
+		if (facingTarget) {
 			leftDrivePower = LINEAR_PROPORTIONAL_GAIN * errorCurrent + LINEAR_INTEGRAL_GAIN * accumulatedError
 					+ ANGLER_PROPORTIONAL_GAIN * headingError;
 			rightDrivePower = LINEAR_PROPORTIONAL_GAIN * errorCurrent + LINEAR_INTEGRAL_GAIN * accumulatedError
 					- ANGLER_PROPORTIONAL_GAIN * headingError;
-		} else if (Math.abs(headingError) > 90) {
+		} else {
 			leftDrivePower = -1 * LINEAR_PROPORTIONAL_GAIN * headingError + LINEAR_INTEGRAL_GAIN * accumulatedError
 					+ ANGLER_PROPORTIONAL_GAIN * headingError;
 			rightDrivePower = -1 * LINEAR_PROPORTIONAL_GAIN * headingError + LINEAR_INTEGRAL_GAIN * accumulatedError
@@ -240,6 +246,14 @@ public class DriveTrain {
 		getJoystickValues();
 		checkForGearShift();
 		driveMode = "Operator Control";
+	}
+
+	public void setHiGear() {
+		gearShifter.set(DoubleSolenoid.Value.kForward);
+	}
+
+	public void setLoGear() {
+		gearShifter.set(DoubleSolenoid.Value.kReverse);
 	}
 
 	public void updateTelemetry() {

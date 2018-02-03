@@ -23,7 +23,7 @@ public class ArmPivoter {
 	TalonSRX pivotMotor;
 
 	double armPosition = -90;
-	double armSetpoint = -90;
+	double armSetpoint = 90;
 	double armPositionError = 0;
 	double armPositionErrorLast = 0;
 	private double accumulatedError = 0;
