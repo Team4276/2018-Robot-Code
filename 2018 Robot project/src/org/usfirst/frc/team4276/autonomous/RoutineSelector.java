@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.usfirst.frc.team4276.robot.Robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 public class RoutineSelector extends Thread implements Runnable {
@@ -38,6 +39,8 @@ public class RoutineSelector extends Thread implements Runnable {
 	static int startingPosition = 0;
 	static int strategy = 0;
 	static int autoModeToExecute;
+
+	public boolean breakLoop = false;
 
 	public RoutineSelector() {
 		selectionModeArray[COMMIT_MODE] = "Commit mode";
@@ -73,6 +76,10 @@ public class RoutineSelector extends Thread implements Runnable {
 
 	}
 
+	public void kill() {
+		breakLoop = true;
+	}
+
 	public void run() {
 		try {
 			while (true) {
@@ -91,8 +98,12 @@ public class RoutineSelector extends Thread implements Runnable {
 				// SmartDashboard.putString("Auto mode",
 				// strategyArray[strategy]);
 
-				Robot.systemTimer.delay(0.1);
+				Timer.delay(0.1);
 				SmartDashboard.putBoolean("AutoSelector Error", false);
+
+				if (breakLoop) {
+					break;
+				}
 			}
 		} catch (Exception autoSelectorError) {
 

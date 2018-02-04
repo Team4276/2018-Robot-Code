@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.Timer;
 
 import org.usfirst.frc.team4276.autonomous.PositionFinder;
 import org.usfirst.frc.team4276.autonomous.AutoSequences;
+import org.usfirst.frc.team4276.autonomous.RoutineSelector;
 
 import org.usfirst.frc.team4276.systems.ArmPivoter;
 import org.usfirst.frc.team4276.systems.Climber;
@@ -31,16 +32,21 @@ public class Robot extends SampleRobot {
 	public static ArmPivoter armPivoter;
 
 	public static PositionFinder positionFinder;
+	public static RoutineSelector routineSelector;
 	public AutoSequences autoSequences;
 
 	public Robot() {
 		// Master timer
+
 		systemTimer = new Timer();
 		systemTimer.start();
 
 		// Controllers
+
 		logitechJoystickL = new Joystick(0);
+
 		logitechJoystickR = new Joystick(1);
+
 		xboxController = new Joystick(2);
 
 		// Mechanisms
@@ -61,17 +67,22 @@ public class Robot extends SampleRobot {
 
 		// Autonomous
 
+		routineSelector = new RoutineSelector();
+
 		positionFinder = new PositionFinder(RoboRioPorts.DIO_DRIVE_LEFT_A, RoboRioPorts.DIO_DRIVE_LEFT_B,
 				RoboRioPorts.DIO_DRIVE_RIGHT_A, RoboRioPorts.DIO_DRIVE_RIGHT_B);
+
 		autoSequences = new AutoSequences();
 
 		// Threads
 
 		armPivoter.start();
-		
+
 		elevator.start();
-		
+
 		positionFinder.start();
+
+		routineSelector.start();
 
 	}
 
@@ -80,7 +91,7 @@ public class Robot extends SampleRobot {
 	}
 
 	public void autonomous() {
-		while (isEnabled()) {
+		while (isAutonomous() && isEnabled()) {
 			autoSequences.loop();
 			Timer.delay(0.05);
 		}
@@ -90,6 +101,8 @@ public class Robot extends SampleRobot {
 	public void operatorControl() {
 
 		positionFinder.kill();
+		routineSelector.kill();
+		driveTrain.resetDrive();
 
 		while (isOperatorControl() && isEnabled()) {
 
