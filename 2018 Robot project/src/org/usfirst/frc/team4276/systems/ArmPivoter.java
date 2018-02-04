@@ -3,6 +3,7 @@ package org.usfirst.frc.team4276.systems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team4276.robot.Robot;
@@ -18,7 +19,7 @@ import org.usfirst.frc.team4276.utilities.Xbox;
  *
  */
 
-public class ArmPivoter {
+public class ArmPivoter extends Thread implements Runnable {
 
 	TalonSRX pivotMotor;
 
@@ -41,7 +42,10 @@ public class ArmPivoter {
 	final double TORQUE_GAIN = 0;
 	final double UPPER_LIMIT = 90;
 	final double LOWER_LIMIT = -90;
-	final double DEGREES_PER_PULSE = 1; // placeholder
+	final double DEGREES_PER_PULSE = (360 / 1024) / 2; // needs testing: 360
+														// deg/rev | 1024
+														// pulse/rev | 2:1
+														// reduction
 
 	public ArmPivoter(int pivoterCANPort) {
 
@@ -155,6 +159,14 @@ public class ArmPivoter {
 
 	public void updateTelemetry() {
 		SmartDashboard.putNumber("Arm Angle:", armPosition);
+	}
+
+	public void run() {
+		while (true) {
+			performMainProcessing();
+			updateTelemetry();
+			Timer.delay(0.05);
+		}
 	}
 
 }

@@ -32,7 +32,10 @@ public class RoboRioPorts {
 	public static final int DRIVE_DOUBLE_SOLENOID_FWD = 3;
 	public static final int DRIVE_DOUBLE_SOLENOID_REV = 4;
 
-	public static final int CUBE_MANIPULATOR = 2;
+	public static final int GRABBER_PISTON_FWD = 2;
+	public static final int GRABBER_PISTON_REV = 1;
+
+	public static final int CLIMBER_PISTON = 0;
 
 	// *** DIO ***
 	// Example:

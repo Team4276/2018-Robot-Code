@@ -22,6 +22,8 @@ public class PositionFinder extends Thread implements Runnable {
 	static double currentX = 0;
 	static double currentY = 0;
 
+	public boolean breakLoop = false;
+
 	public PositionFinder(int encoder1A, int encoder1B, int encoder2A, int encoder2B) {
 
 		driveEncoderL = new Encoder(encoder1A, encoder1B);
@@ -75,6 +77,10 @@ public class PositionFinder extends Thread implements Runnable {
 		previousXY = XY;
 	}
 
+	public void kill() {
+		breakLoop = true;
+	}
+
 	private void updateSmartDashboard() {
 		SmartDashboard.putNumber("Heading", currentHeadingDeg);
 		SmartDashboard.putNumberArray("Robot Coordinates:", currentXY);
@@ -88,6 +94,10 @@ public class PositionFinder extends Thread implements Runnable {
 			updateHeading();
 			updatePosition();
 			updateSmartDashboard();
+			if (breakLoop) {
+				break;
+			}
+
 			Timer.delay(00.125);
 		}
 	}

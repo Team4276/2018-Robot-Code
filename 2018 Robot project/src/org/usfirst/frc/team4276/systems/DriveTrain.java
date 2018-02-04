@@ -32,7 +32,7 @@ public class DriveTrain {
 	public int lowShifter = 3;
 	public final double SHIFT_TIME = .05;
 
-	public boolean driveInit;
+	public boolean driveInit = true;
 
 	private double accumulatedError;
 	private double errorLast = 0;
@@ -117,6 +117,7 @@ public class DriveTrain {
 		if (driveInit == true) {
 			accumulatedError = 0;
 			errorLast = 0;
+			driveInit = false;
 		}
 		boolean status = false;
 		double timeStep = Robot.systemTimer.get();
@@ -146,11 +147,17 @@ public class DriveTrain {
 		return status;
 	}
 
+	public void resetDrive() {
+		setMotorSpeeds(0);
+		driveInit = true;
+	}
+
 	public boolean rotateToCoordinate(double[] desiredCoordinateFacing) {
 		if (driveInit == true) {
 			accumulatedError = 0;
 			errorLast = 0;
 			timeNow = Robot.systemTimer.get();
+			driveInit = false;
 		}
 		double desiredHeading = Math.atan2(desiredCoordinateFacing[1], desiredCoordinateFacing[0]);
 		// calculates heading needed to face coordinates based on inputed array
@@ -191,6 +198,7 @@ public class DriveTrain {
 			accumulatedError = 0;
 			errorLast = 0;
 			timeNow = Robot.systemTimer.get();
+			driveInit = false;
 		}
 		double desiredHeading = Math.atan2(desiredCoordinate[1] - PositionFinder.getCurrentLocation()[1],
 				desiredCoordinate[0] - PositionFinder.getCurrentLocation()[0]);
@@ -240,6 +248,19 @@ public class DriveTrain {
 		setMotorSpeeds();
 		driveMode = "Driving to: " + desiredCoordinate[0] + "," + desiredCoordinate[1];
 		return status;
+	}
+
+	public void reverse(boolean isReversing) {
+
+		if (isReversing) {
+			leftDrivePower = -.5;
+			rightDrivePower = -.5;
+		} else {
+			leftDrivePower = -.5;
+			rightDrivePower = -.5;
+		}
+		setMotorSpeeds();
+		driveMode = "Driving Back ";
 	}
 
 	public void performMainProcessing() {

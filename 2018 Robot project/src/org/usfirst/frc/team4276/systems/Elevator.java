@@ -9,7 +9,7 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Elevator {
+public class Elevator extends Thread implements Runnable {
 
 	TalonSRX elevatorDriverMain;
 	VictorSPX elevatorDriverFollow;
@@ -20,9 +20,9 @@ public class Elevator {
 	final double KP_RAIL = 5;
 	final double MANIPULATOR_RAIL_HEIGHT = 10;
 	final double RAIL_HEIGHT = 5;
-	final double SETPOINT_SCALE = 7;
-	final double SETPOINT_SWITCH = 3;
-	final double SETPOINT_BOTTOM = 1;
+	public final double SETPOINT_SCALE = 7;
+	public final double SETPOINT_SWITCH = 3;
+	public final double SETPOINT_BOTTOM = 1;
 	final double SETPOINT_INCREMENT = .05;
 
 	private boolean manualOveride;
@@ -32,7 +32,7 @@ public class Elevator {
 	private double timeStep;
 
 	double estimatedHeight = 0;
-	double commandedHeight = 0;
+	public double commandedHeight = 0;
 	double heightError = 0;
 	double motorPower;
 	double assignedPower;
@@ -49,8 +49,7 @@ public class Elevator {
 
 	}
 
-
-	public void performMainProcess() {
+	public void performMainProcessing() {
 
 		// button Y(Deposit Cube in Scale)
 		if (Robot.xboxController.getRawButton(Xbox.Y)) {
@@ -67,13 +66,12 @@ public class Elevator {
 			commandedHeight = SETPOINT_BOTTOM;
 		}
 
-/*		// Start + Right Axis Y (Manually control Height by Power)
-		if (Robot.xboxController.getRawButton(Xbox.Start)
-				&& (Math.abs(Robot.xboxController.getRawAxis(Xbox.RAxisY)) > -0.5)) {
-			manualOveride = true;
-		} else {
-			manualOveride = false;
-		}*/
+		/*
+		 * // Start + Right Axis Y (Manually control Height by Power) if
+		 * (Robot.xboxController.getRawButton(Xbox.Start) &&
+		 * (Math.abs(Robot.xboxController.getRawAxis(Xbox.RAxisY)) > -0.5)) {
+		 * manualOveride = true; } else { manualOveride = false; }
+		 */
 
 		// Right Axis Y (Manually Change Setpoint)
 		if (Robot.xboxController.getRawAxis(Xbox.RAxisY) > 0.5) {
@@ -103,14 +101,22 @@ public class Elevator {
 			motorPower = POWER_OFFSET_RAIL + (KP_RAIL * heightError);
 			elevatorDriverMain.set(ControlMode.PercentOutput, motorPower);
 		}
-/*
-		if (manualOveride == true) {
-			elevatorDriverMain.set(ControlMode.PercentOutput, Robot.xboxController.getRawAxis(Xbox.RAxisY));
-		}*/
+		/*
+		 * if (manualOveride == true) {
+		 * elevatorDriverMain.set(ControlMode.PercentOutput,
+		 * Robot.xboxController.getRawAxis(Xbox.RAxisY)); }
+		 */
 	}
 
 	public void updateTelemetry() {
 		SmartDashboard.putNumber("Commanded arm height", commandedHeight);
 		SmartDashboard.putNumber("Estimated arm height", estimatedHeight);
+	}
+
+	public void run() {
+		while (true) {
+			performMainProcessing();
+			updateTelemetry();
+		}
 	}
 }

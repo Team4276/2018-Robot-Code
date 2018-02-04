@@ -7,10 +7,13 @@ public class FieldLocations {
 	public static final double[] CENTER_START_POSITION = new double[] { 1.42, 13.5 };
 	public static final double[] LEFT_START_POSITION = new double[] { 1.42, 22 };
 	public static final double[] RIGHT_START_POSITION = new double[] { 1.42, 5 };
-	
+
 	public static final double[] CENTER_DRIVE_OFF_WALL = new double[] { 4.42, 13.5 };
-	public static final double[] SWITCH_PREP_LEFT = new double[] { 7.2, 18.2 };
-	public static final double[] SWITCH_PREP_RIGHT = new double[] { 7.2, 8.8 };
+	public static final double[] CROSS_BASE_LINE = new double[] { 27, 13.5 };
+	public static final double[] SWITCH_PREP_LEFT_A = new double[] { 7.2, 18.2 };
+	public static final double[] SWITCH_PREP_RIGHT_A = new double[] { 7.2, 8.8 };
+	public static final double[] SWITCH_PREP_LEFT_B = new double[] { 14, 22 };
+	public static final double[] SWITCH_PREP_RIGHT_B = new double[] { 14, 5 };
 
 	public static final double[] leftScaleLocation = new double[] { 27, 19.5 };
 	public static final double[] rightScaleLocation = new double[] { 27, 7.5 };
@@ -19,8 +22,8 @@ public class FieldLocations {
 	public static final double[] leftCornerCubeLocation = new double[] { 16.9, 19.3 };
 	public static final double[] rightCornerCubeLocation = new double[] { 16.9, 7.6 };
 
-	public static final double[] leftScaleScoringZoneA = new double[] { 24.3, 19.9 };
-	public static final double[] rightScaleScoringZoneA = new double[] { 24.3, 7 };
+	public static final double[] leftScaleScoringZoneA = new double[] { 24, 21 };
+	public static final double[] rightScaleScoringZoneA = new double[] { 24, 6 };
 	public static final double[] leftSwitchScoringZoneA = new double[] { 11, 18.2 };
 	public static final double[] rightSwitchScoringZoneA = new double[] { 11, 8.8 };
 	public static final double[] leftScaleScoringZoneB = new double[] { 27, 21.7 };
