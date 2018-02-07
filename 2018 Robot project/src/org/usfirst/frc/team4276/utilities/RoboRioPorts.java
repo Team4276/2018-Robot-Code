@@ -42,8 +42,8 @@ public class RoboRioPorts {
 	// static final int DIO_DRIVE_LEFT_A = 0;
 
 	public static final int DIO_DRIVE_LEFT_A = 0;
-	public static final int DIO_DRIVE_LEFT_B = 0;
-	public static final int DIO_DRIVE_RIGHT_A = 0;
-	public static final int DIO_DRIVE_RIGHT_B = 0;
+	public static final int DIO_DRIVE_LEFT_B = 1;
+	public static final int DIO_DRIVE_RIGHT_A = 2;
+	public static final int DIO_DRIVE_RIGHT_B = 3;
 
 }
