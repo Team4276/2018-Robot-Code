@@ -63,10 +63,21 @@ public class DriveTrain {
 	}
 
 	public void getJoystickValues() {
+		final double DRIVE_PROFILE_EXPONENT = 1.5;
+		final double JOYSTICK_DEADBAND = 0.07;
 
-		leftDrivePower = Robot.logitechJoystickL.getY();
-		rightDrivePower = Robot.logitechJoystickR.getY();
+		rightDrivePower = -1 * Math.pow(Robot.logitechJoystickR.getY(), DRIVE_PROFILE_EXPONENT);
+		if (Robot.logitechJoystickL.getY() > JOYSTICK_DEADBAND) {
+			leftDrivePower = Math.pow(Robot.logitechJoystickL.getY(), DRIVE_PROFILE_EXPONENT);
+		} else {
+			leftDrivePower = 0;
+		}
 
+		if (Robot.logitechJoystickR.getY() > JOYSTICK_DEADBAND) {
+			rightDrivePower = Math.pow(Robot.logitechJoystickR.getY(), DRIVE_PROFILE_EXPONENT);
+		} else {
+			rightDrivePower = 0;
+		}
 	}
 
 	public void checkForGearShift() {
