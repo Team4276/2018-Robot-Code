@@ -92,7 +92,11 @@ public class Robot extends SampleRobot {
 
 	public void autonomous() {
 		while (isAutonomous() && isEnabled()) {
-			autoSequences.loop();
+			double desiredCoordinate[] = { 4, 4 };
+			//driveTrain.rotateToHeading(45);
+			//driveTrain.rotateToCoordinate(desiredCoordinate);
+			//driveTrain.driveToCoordinate(desiredCoordinate);
+			// autoSequences.loop();
 			Timer.delay(0.05);
 		}
 

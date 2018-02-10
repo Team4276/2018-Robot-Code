@@ -66,7 +66,6 @@ public class DriveTrain {
 		final double DRIVE_PROFILE_EXPONENT = 1.5;
 		final double JOYSTICK_DEADBAND = 0.07;
 
-		rightDrivePower = -1 * Math.pow(Robot.logitechJoystickR.getY(), DRIVE_PROFILE_EXPONENT);
 		if (Robot.logitechJoystickL.getY() > JOYSTICK_DEADBAND) {
 			leftDrivePower = Math.pow(Robot.logitechJoystickL.getY(), DRIVE_PROFILE_EXPONENT);
 		} else {
@@ -116,7 +115,7 @@ public class DriveTrain {
 
 	public void setMotorSpeeds() {
 		leftMotor.set(ControlMode.PercentOutput, leftDrivePower);
-		rightMotor.set(ControlMode.PercentOutput, rightDrivePower);
+		rightMotor.set(ControlMode.PercentOutput, (-1 * rightDrivePower));
 	}
 
 	public void setMotorSpeeds(double speed) {
@@ -233,11 +232,16 @@ public class DriveTrain {
 
 		final double LINEAR_PROPORTIONAL_GAIN = .1;
 		final double LINEAR_INTEGRAL_GAIN = 0;
-		final double ANGLER_PROPORTIONAL_GAIN = .015; // degrees
+		double ANGLER_PROPORTIONAL_GAIN = .015; // degrees
+		final double ANGLE_DEADBAND = 2; // feet
 		final double LINEAR_DEADBAND = 0.1; // feet
 		final double LINEAR_RATE_DEADBAND = .5; // feet per second
 
 		boolean facingTarget = (Math.abs(headingError) < 90);
+
+		if (errorCurrent < ANGLE_DEADBAND) {
+			ANGLER_PROPORTIONAL_GAIN = 0;
+		}
 
 		if (facingTarget) {
 			leftDrivePower = LINEAR_PROPORTIONAL_GAIN * errorCurrent + LINEAR_INTEGRAL_GAIN * accumulatedError
