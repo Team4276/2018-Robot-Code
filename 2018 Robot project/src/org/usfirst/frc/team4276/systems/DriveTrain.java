@@ -8,6 +8,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -27,10 +28,13 @@ public class DriveTrain {
 
 	private boolean shiftInit = true;
 
-	public double leftDrivePower, rightDrivePower;
+	public double leftDrivePower = 0;
+	public double rightDrivePower = 0;
 	public int highShifter = 4;
 	public int lowShifter = 3;
-	public final double SHIFT_TIME = .05;
+	public final double SHIFT_TIME = 0.05; //sec
+	final Value HI_GEAR_VALUE = DoubleSolenoid.Value.kForward;
+	final Value LO_GEAR_VALUE = DoubleSolenoid.Value.kReverse;
 
 	public boolean driveInit = true;
 
@@ -63,17 +67,21 @@ public class DriveTrain {
 	}
 
 	public void getJoystickValues() {
-		final double DRIVE_PROFILE_EXPONENT = 1.5;
-		final double JOYSTICK_DEADBAND = 0.07;
+		final double DRIVE_PROFILE_EXPONENT = 5/2; // must be > 1
+		final double JOYSTICK_DEADBAND = 0.2; // must be positive
 
 		if (Robot.logitechJoystickL.getY() > JOYSTICK_DEADBAND) {
 			leftDrivePower = Math.pow(Robot.logitechJoystickL.getY(), DRIVE_PROFILE_EXPONENT);
+		} else if (Robot.logitechJoystickL.getY() < -JOYSTICK_DEADBAND) {
+			leftDrivePower = -1 * Math.abs(Math.pow(Robot.logitechJoystickL.getY(), DRIVE_PROFILE_EXPONENT));
 		} else {
 			leftDrivePower = 0;
 		}
 
 		if (Robot.logitechJoystickR.getY() > JOYSTICK_DEADBAND) {
 			rightDrivePower = Math.pow(Robot.logitechJoystickR.getY(), DRIVE_PROFILE_EXPONENT);
+		} else if (Robot.logitechJoystickR.getY() < -JOYSTICK_DEADBAND) {
+			rightDrivePower = -1 * Math.abs(Math.pow(Robot.logitechJoystickR.getY(), DRIVE_PROFILE_EXPONENT));
 		} else {
 			rightDrivePower = 0;
 		}
@@ -94,7 +102,7 @@ public class DriveTrain {
 			} else {
 				setMotorSpeeds(0);
 			}
-			gearShifter.set(DoubleSolenoid.Value.kForward);
+			gearShifter.set(HI_GEAR_VALUE);
 		} else if (shiftLo) {
 			if (shiftInit) {
 				shiftTimer.setTimer(SHIFT_TIME);
@@ -106,7 +114,7 @@ public class DriveTrain {
 			} else {
 				setMotorSpeeds(0);
 			}
-			gearShifter.set(DoubleSolenoid.Value.kReverse);
+			gearShifter.set(LO_GEAR_VALUE);
 		} else {
 			setMotorSpeeds();
 		}
@@ -120,7 +128,7 @@ public class DriveTrain {
 
 	public void setMotorSpeeds(double speed) {
 		leftMotor.set(ControlMode.PercentOutput, speed);
-		rightMotor.set(ControlMode.PercentOutput, speed);
+		rightMotor.set(ControlMode.PercentOutput, -speed);
 	}
 
 	public boolean rotateToHeading(double desiredHeading) {
@@ -285,16 +293,16 @@ public class DriveTrain {
 	}
 
 	public void setHiGear() {
-		gearShifter.set(DoubleSolenoid.Value.kForward);
+		gearShifter.set(HI_GEAR_VALUE);
 	}
 
 	public void setLoGear() {
-		gearShifter.set(DoubleSolenoid.Value.kReverse);
+		gearShifter.set(LO_GEAR_VALUE);
 	}
 
 	public void updateTelemetry() {
-		SmartDashboard.putBoolean("High Gear", Robot.logitechJoystickR.getRawButton(highShifter));
-		SmartDashboard.putBoolean("Low Gear", Robot.logitechJoystickR.getRawButton(lowShifter));
+		Value gearMode = gearShifter.get();
+		SmartDashboard.putBoolean("High Gear", gearMode == HI_GEAR_VALUE);
 		SmartDashboard.putBoolean("Shifting In Progress", !shiftTimer.isExpired());
 		SmartDashboard.putNumber("Left Drive Power", leftDrivePower);
 		SmartDashboard.putNumber("Right Drive Power", rightDrivePower);

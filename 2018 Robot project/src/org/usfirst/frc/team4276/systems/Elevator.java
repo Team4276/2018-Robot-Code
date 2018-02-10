@@ -16,26 +16,35 @@ public class Elevator extends Thread implements Runnable {
 
 	final double POWER_OFFSET_MANIPULATOR = 4;
 	final double POWER_OFFSET_RAIL = 7;
-	final double KP_MANIPULATOR = 3;
-	final double KP_RAIL = 5;
-	final double MANIPULATOR_RAIL_HEIGHT = 10;
+	final double KP_LOWER = 3;
+	final double KI_LOWER = 2;
+	final double KD_LOWER = 1;
+	final double KP_UPPER = 5;
+	final double KI_UPPER = 5;
+	final double KD_UPPER = 5;
+	final double LOWER_HEIGHT = 10;
 	final double RAIL_HEIGHT = 5;
 	public final double SETPOINT_SCALE = 7;
 	public final double SETPOINT_SWITCH = 3;
 	public final double SETPOINT_BOTTOM = 1;
-	final double SETPOINT_INCREMENT = .05;
+	final double SETPOINT_INCREMENT = .05; // units height
+	final double OVERRIDE_INCREMENT = 0.05; // 5%
 
-	private boolean manualOveride;
+	private boolean manualOverride;
 	private boolean initializePID = true;
 	private double timeNow;
 	private double timePrevious;
 	private double timeStep;
+	private double accumulatedError = 0;
+	private double rateError = 0;
 
 	double estimatedHeight = 0;
 	public double commandedHeight = 0;
 	double heightError = 0;
-	double motorPower;
+	double heightErrorLast = 0;
+	double motorPower = 0;
 	double assignedPower;
+	double HEIGHT_PER_PULSE = 1; //
 
 	final double initiliazedPoint = 0;
 	final double derivativePoint = 0;
@@ -50,6 +59,24 @@ public class Elevator extends Thread implements Runnable {
 	}
 
 	public void performMainProcessing() {
+
+		// Start + Right Axis Y (Manually control Height by Power)
+		if (Robot.xboxController.getRawButton(Xbox.Start)
+				&& (Math.abs(Robot.xboxController.getRawAxis(Xbox.RAxisY)) > 0.5)) {
+			manualOverride = true;
+		} else {
+			manualOverride = false;
+		}
+		
+		if (manualOverride == true) {
+			if (Robot.xboxController.getRawAxis(Xbox.RAxisY) < 0) {
+				motorPower = motorPower + OVERRIDE_INCREMENT;
+			} else {
+				motorPower = motorPower - OVERRIDE_INCREMENT;
+			} 
+			elevatorDriverMain.set(ControlMode.PercentOutput, motorPower);
+			return;
+		} 
 
 		// button Y(Deposit Cube in Scale)
 		if (Robot.xboxController.getRawButton(Xbox.Y)) {
@@ -66,12 +93,6 @@ public class Elevator extends Thread implements Runnable {
 			commandedHeight = SETPOINT_BOTTOM;
 		}
 
-		/*
-		 * // Start + Right Axis Y (Manually control Height by Power) if
-		 * (Robot.xboxController.getRawButton(Xbox.Start) &&
-		 * (Math.abs(Robot.xboxController.getRawAxis(Xbox.RAxisY)) > -0.5)) {
-		 * manualOveride = true; } else { manualOveride = false; }
-		 */
 
 		// Right Axis Y (Manually Change Setpoint)
 		if (Robot.xboxController.getRawAxis(Xbox.RAxisY) > 0.5) {
@@ -81,36 +102,53 @@ public class Elevator extends Thread implements Runnable {
 		}
 
 		// Limit commanded height range
-		if (commandedHeight > MANIPULATOR_RAIL_HEIGHT) {
-			commandedHeight = MANIPULATOR_RAIL_HEIGHT;
+		if (commandedHeight > LOWER_HEIGHT) {
+			commandedHeight = LOWER_HEIGHT;
 		} else if (commandedHeight > SETPOINT_BOTTOM) {
 			commandedHeight = SETPOINT_BOTTOM;
 		}
 
-		// PID control
-		if (commandedHeight < MANIPULATOR_RAIL_HEIGHT) {
-			// PID for manipulator rail
-			estimatedHeight = elevatorDriverMain.getSensorCollection().getQuadraturePosition();
-			heightError = commandedHeight - estimatedHeight;
-			motorPower = POWER_OFFSET_MANIPULATOR + (KP_MANIPULATOR * heightError);
-			elevatorDriverMain.set(ControlMode.PercentOutput, motorPower);
-		} else {
-			// PID for second rail
-			estimatedHeight = elevatorDriverMain.getSensorCollection().getQuadraturePosition();
-			heightError = commandedHeight - estimatedHeight;
-			motorPower = POWER_OFFSET_RAIL + (KP_RAIL * heightError);
-			elevatorDriverMain.set(ControlMode.PercentOutput, motorPower);
-		}
-		/*
-		 * if (manualOveride == true) {
-		 * elevatorDriverMain.set(ControlMode.PercentOutput,
-		 * Robot.xboxController.getRawAxis(Xbox.RAxisY)); }
-		 */
+		
+			if (initializePID == true) {
+				timeNow = Robot.systemTimer.get();
+				estimatedHeight = elevatorDriverMain.getSensorCollection().getQuadraturePosition() * HEIGHT_PER_PULSE;
+				heightError = commandedHeight - estimatedHeight;
+				accumulatedError = 0.0;
+				initializePID = false;
+			} else {
+				heightErrorLast = heightError;
+				timePrevious = timeNow;
+				timeNow = Robot.systemTimer.get();
+				estimatedHeight = elevatorDriverMain.getSensorCollection().getQuadraturePosition() * HEIGHT_PER_PULSE;
+				timeStep = timeNow - timePrevious;
+
+				// Compute control errors
+				heightError = commandedHeight - estimatedHeight; // height
+				accumulatedError = accumulatedError + (heightErrorLast + heightError) / 2 * timeStep; // height*sec
+				rateError = -elevatorDriverMain.getSensorCollection().getQuadratureVelocity() * 10 * HEIGHT_PER_PULSE; // height/sec
+
+				// Compute PID e power
+				if (commandedHeight < LOWER_HEIGHT) {
+					// PID for lower rail
+					motorPower = POWER_OFFSET_MANIPULATOR + (KP_LOWER * heightError) + (KI_LOWER * accumulatedError)
+							+ (KD_LOWER * rateError);
+				} else {
+					// PID for upper rail
+					motorPower = POWER_OFFSET_RAIL + (KP_UPPER * heightError) + (KI_UPPER * accumulatedError)
+							+ (KD_UPPER * rateError);
+				}
+
+			}
+		
+
+		// Apply motor power
+		elevatorDriverMain.set(ControlMode.PercentOutput, motorPower);
 	}
 
 	public void updateTelemetry() {
 		SmartDashboard.putNumber("Commanded arm height", commandedHeight);
 		SmartDashboard.putNumber("Estimated arm height", estimatedHeight);
+		SmartDashboard.putBoolean("Manual Override", manualOverride);
 	}
 
 	public void run() {
