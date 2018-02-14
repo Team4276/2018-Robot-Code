@@ -32,7 +32,7 @@ public class DriveTrain {
 	public double rightDrivePower = 0;
 	public int highShifter = 4;
 	public int lowShifter = 3;
-	public final double SHIFT_TIME = 0.05; //sec
+	public final double SHIFT_TIME = 0.05; // sec
 	final Value HI_GEAR_VALUE = DoubleSolenoid.Value.kForward;
 	final Value LO_GEAR_VALUE = DoubleSolenoid.Value.kReverse;
 
@@ -64,10 +64,12 @@ public class DriveTrain {
 
 		gearShifter = new DoubleSolenoid(shifterAPort, shifterBPort);
 
+		shiftTimer = new SoftwareTimer();
+
 	}
 
 	public void getJoystickValues() {
-		final double DRIVE_PROFILE_EXPONENT = 5/2; // must be > 1
+		final double DRIVE_PROFILE_EXPONENT = 5 / 2; // must be > 1
 		final double JOYSTICK_DEADBAND = 0.2; // must be positive
 
 		if (Robot.logitechJoystickL.getY() > JOYSTICK_DEADBAND) {
@@ -145,17 +147,19 @@ public class DriveTrain {
 																							// integral
 																							// of
 																							// heading
+
+		SmartDashboard.putNumber("Heading Error", headingErrorCurrent);
 		double errorRate = (headingErrorCurrent - errorLast) / timeStep; // integral
 
-		final double PROPORTIONAL_GAIN = .015;
-		final double INTEGRAL_GAIN = 0;
+		final double PROPORTIONAL_GAIN = .007;
+		final double INTEGRAL_GAIN = 0.000007;
 		final double POSITION_DEADBAND = 2; // degrees
 		final double RATE_DEADBAND = 10; // degrees per second
 
 		leftDrivePower = PROPORTIONAL_GAIN * headingErrorCurrent + INTEGRAL_GAIN * accumulatedError;
 		rightDrivePower = -1 * (PROPORTIONAL_GAIN * headingErrorCurrent + INTEGRAL_GAIN * accumulatedError);
 
-		if (Math.abs(headingErrorCurrent) < POSITION_DEADBAND && Math.abs(errorRate) < RATE_DEADBAND) {
+		if (Math.abs(headingErrorCurrent) < POSITION_DEADBAND /* && Math.abs(errorRate) < RATE_DEADBAND */) {
 			status = true;
 			leftDrivePower = 0;
 			rightDrivePower = 0;
@@ -177,7 +181,9 @@ public class DriveTrain {
 			timeNow = Robot.systemTimer.get();
 			driveInit = false;
 		}
-		double desiredHeading = Math.atan2(desiredCoordinateFacing[1], desiredCoordinateFacing[0]);
+		double desiredHeading = Math
+				.toDegrees(Math.atan2(desiredCoordinateFacing[1] - PositionFinder.getCurrentLocation()[1],
+						desiredCoordinateFacing[0] - PositionFinder.getCurrentLocation()[0]));
 		// calculates heading needed to face coordinates based on inputed array
 
 		boolean status = false;
@@ -193,8 +199,8 @@ public class DriveTrain {
 
 		double errorRate = (headingErrorCurrent - errorLast) / timeStep; // integral
 
-		final double PROPORTIONAL_GAIN = .015;
-		final double INTEGRAL_GAIN = 0;
+		final double PROPORTIONAL_GAIN = 0.007;
+		final double INTEGRAL_GAIN = 0.000007;
 		final double POSITION_DEADBAND = 2; // degrees
 		final double RATE_DEADBAND = 10; // degrees per second
 
@@ -218,8 +224,8 @@ public class DriveTrain {
 			timeNow = Robot.systemTimer.get();
 			driveInit = false;
 		}
-		double desiredHeading = Math.atan2(desiredCoordinate[1] - PositionFinder.getCurrentLocation()[1],
-				desiredCoordinate[0] - PositionFinder.getCurrentLocation()[0]);
+		double desiredHeading = Math.toDegrees(Math.atan2(desiredCoordinate[1] - PositionFinder.getCurrentLocation()[1],
+				desiredCoordinate[0] - PositionFinder.getCurrentLocation()[0]));
 		// calculates heading needed to face coordinates based on inputed array
 
 		boolean status = false;
@@ -236,12 +242,16 @@ public class DriveTrain {
 		accumulatedError = accumulatedError + (errorCurrent + errorLast) * timeStep;
 		// calculates integral of heading error
 
+		SmartDashboard.putNumber("Heading Error", headingError);
+
+		SmartDashboard.putNumber("Distance Error", errorCurrent);
+
 		double errorRate = (errorCurrent - errorLast) / timeStep; // integral
 
-		final double LINEAR_PROPORTIONAL_GAIN = .1;
-		final double LINEAR_INTEGRAL_GAIN = 0;
-		double ANGLER_PROPORTIONAL_GAIN = .015; // degrees
-		final double ANGLE_DEADBAND = 2; // feet
+		final double LINEAR_PROPORTIONAL_GAIN = .075;
+		final double LINEAR_INTEGRAL_GAIN = 0.01;
+		double ANGLER_PROPORTIONAL_GAIN = .005; // degrees
+		final double ANGLE_DEADBAND = 1; // feet
 		final double LINEAR_DEADBAND = 0.1; // feet
 		final double LINEAR_RATE_DEADBAND = .5; // feet per second
 
@@ -252,18 +262,21 @@ public class DriveTrain {
 		}
 
 		if (facingTarget) {
+			leftDrivePower = -1 * (LINEAR_PROPORTIONAL_GAIN * errorCurrent + LINEAR_INTEGRAL_GAIN * accumulatedError
+					- ANGLER_PROPORTIONAL_GAIN * headingError);
+			rightDrivePower = -1 * (LINEAR_PROPORTIONAL_GAIN * errorCurrent + LINEAR_INTEGRAL_GAIN * accumulatedError
+					+ ANGLER_PROPORTIONAL_GAIN * headingError);
+			SmartDashboard.putString("Direction", "facing");
+		} else {
 			leftDrivePower = LINEAR_PROPORTIONAL_GAIN * errorCurrent + LINEAR_INTEGRAL_GAIN * accumulatedError
 					+ ANGLER_PROPORTIONAL_GAIN * headingError;
 			rightDrivePower = LINEAR_PROPORTIONAL_GAIN * errorCurrent + LINEAR_INTEGRAL_GAIN * accumulatedError
 					- ANGLER_PROPORTIONAL_GAIN * headingError;
-		} else {
-			leftDrivePower = -1 * LINEAR_PROPORTIONAL_GAIN * headingError + LINEAR_INTEGRAL_GAIN * accumulatedError
-					+ ANGLER_PROPORTIONAL_GAIN * headingError;
-			rightDrivePower = -1 * LINEAR_PROPORTIONAL_GAIN * headingError + LINEAR_INTEGRAL_GAIN * accumulatedError
-					- ANGLER_PROPORTIONAL_GAIN * headingError;
+
+			SmartDashboard.putString("Direction", "away");
 		}
 
-		if (Math.abs(errorCurrent) < LINEAR_DEADBAND && Math.abs(errorRate) < LINEAR_RATE_DEADBAND) {
+		if (Math.abs(errorCurrent) < LINEAR_DEADBAND) {
 			status = true;
 			leftDrivePower = 0;
 			rightDrivePower = 0;

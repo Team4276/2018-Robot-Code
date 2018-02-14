@@ -28,19 +28,22 @@ public class PositionFinder extends Thread implements Runnable {
 
 		driveEncoderL = new Encoder(encoder1A, encoder1B);
 		driveEncoderR = new Encoder(encoder2A, encoder2B);
+		
+		driveEncoderL.setDistancePerPulse(10/12644.375);
+		driveEncoderR.setDistancePerPulse(10/12644.375);
 
 		robotIMU = new ADIS16448_IMU();
 
 	}
 
 	private void updateHeading() {
-		double currentHeadingTemp = -1 * robotIMU.getYaw();
-		while (Math.abs(currentHeadingTemp) > 180) {
-			if (currentHeadingTemp > 0) {
-				currentHeadingTemp = currentHeadingTemp - 360;
-			} else {
-				currentHeadingTemp = currentHeadingTemp + 360;
-			}
+		double currentHeadingTemp = -1 * robotIMU.getAngleZ();
+		SmartDashboard.putNumber("head", currentHeadingTemp);
+		while (currentHeadingTemp > 180) {
+			currentHeadingTemp = currentHeadingTemp - 360;
+		}
+		while (currentHeadingTemp < -180) {
+			currentHeadingTemp = currentHeadingTemp + 360;
 		}
 		currentHeadingDeg = currentHeadingTemp;
 		currentHeadingRad = Math.toRadians(currentHeadingDeg);
@@ -56,9 +59,13 @@ public class PositionFinder extends Thread implements Runnable {
 
 	private void updatePosition() {
 		double PL = driveEncoderL.getDistance();
-		double PR = driveEncoderR.getDistance();
+		double PR = -1 * driveEncoderR.getDistance();
+
+		SmartDashboard.putNumber("LEFT ENCODER", PL);
+		SmartDashboard.putNumber("RIGHT ENCODER", PR);
+
 		driveEncoderL.reset();
-		driveEncoderL.reset();
+		driveEncoderR.reset();
 		double deltaPosition = 0.5 * (PL + PR);
 		double deltaX = Math.cos(currentHeadingRad) * deltaPosition;
 		double deltaY = Math.sin(currentHeadingRad) * deltaPosition;
@@ -81,9 +88,14 @@ public class PositionFinder extends Thread implements Runnable {
 		breakLoop = true;
 	}
 
+	public void calibrateImu() {
+		robotIMU.calibrate();
+	}
+
 	private void updateSmartDashboard() {
 		SmartDashboard.putNumber("Heading", currentHeadingDeg);
-		SmartDashboard.putNumberArray("Robot Coordinates:", currentXY);
+		SmartDashboard.putNumber("Robot X:", currentXY[0]);
+		SmartDashboard.putNumber("Robot Y:", currentXY[1]);
 	}
 
 	public void run() {
@@ -94,6 +106,7 @@ public class PositionFinder extends Thread implements Runnable {
 			updateHeading();
 			updatePosition();
 			updateSmartDashboard();
+
 			if (breakLoop) {
 				break;
 			}

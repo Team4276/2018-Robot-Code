@@ -18,7 +18,7 @@ public class Xbox {
 
 	// Axis control mappings
 	// Notes:
-	// - Left and right trigger use axis 3
+	// - Left and right trigger use axis 2,3
 	// - Left trigger range: 0 to 1
 	// - Right trigger range: 0 to -1).
 	static public int LAxisX = 6;

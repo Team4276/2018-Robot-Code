@@ -88,14 +88,16 @@ public class Robot extends SampleRobot {
 
 	public void robotInit() {
 
+		positionFinder.calibrateImu();
+		
 	}
 
 	public void autonomous() {
 		while (isAutonomous() && isEnabled()) {
-			double desiredCoordinate[] = { 4, 4 };
-			//driveTrain.rotateToHeading(45);
+			double desiredCoordinate[] = { 8, -4 };
+			//driveTrain.rotateToHeading(90);
 			//driveTrain.rotateToCoordinate(desiredCoordinate);
-			//driveTrain.driveToCoordinate(desiredCoordinate);
+			if(driveTrain.driveToCoordinate(desiredCoordinate));
 			// autoSequences.loop();
 			Timer.delay(0.05);
 		}
@@ -104,7 +106,7 @@ public class Robot extends SampleRobot {
 
 	public void operatorControl() {
 
-		positionFinder.kill();
+		//positionFinder.kill();
 		routineSelector.kill();
 		driveTrain.resetDrive();
 
@@ -113,7 +115,7 @@ public class Robot extends SampleRobot {
 			driveTrain.performMainProcessing();
 			// robotClimber.performMainProcessing();
 			// robotArmPivoter.performMainProcessing();
-			// cubeManipulator.performMainProcessing();
+			manipulator.performMainProcessing();
 
 			Timer.delay(0.05);
 		}
