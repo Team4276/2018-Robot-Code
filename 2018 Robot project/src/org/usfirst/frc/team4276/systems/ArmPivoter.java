@@ -21,11 +21,11 @@ import org.usfirst.frc.team4276.utilities.Xbox;
 
 public class ArmPivoter extends Thread implements Runnable {
 
-	TalonSRX pivotMotor;
+	TalonSRX pivoter;
 
 	double armPosition = -90;
 	double armSetpoint = 90;
-	double armPositionError = 0;
+	double positionError = 0;
 	double armPositionErrorLast = 0;
 	private double accumulatedError = 0;
 	private double rateError = 0;
@@ -36,9 +36,9 @@ public class ArmPivoter extends Thread implements Runnable {
 	private double timePrevious;
 	private double timeStep;
 
-	final double PROPORTIONAL_GAIN = 0;
-	final double INTEGRAL_GAIN = 0;
-	final double DERIVATIVE_GAIN = 0;
+	double PROPORTIONAL_GAIN = 0;
+	double INTEGRAL_GAIN = 0;
+	double DERIVATIVE_GAIN = 0;
 	final double TORQUE_GAIN = 0;
 	final double UPPER_LIMIT = 90;
 	final double LOWER_LIMIT = -90;
@@ -48,42 +48,57 @@ public class ArmPivoter extends Thread implements Runnable {
 														// reduction
 
 	public ArmPivoter(int pivoterCANPort) {
-
-		pivotMotor = new TalonSRX(pivoterCANPort);
-
+		pivoter = new TalonSRX(pivoterCANPort);
 	}
 
 	private double computeMovementPower() {
 		double assignedPower;
 		if (initializePID == true) {
 			timeNow = Robot.systemTimer.get();
-			armPosition = pivotMotor.getSensorCollection().getQuadraturePosition() * DEGREES_PER_PULSE;
-			armPositionError = armSetpoint - armPosition;
+			armPosition = pivoter.getSensorCollection().getQuadraturePosition() * DEGREES_PER_PULSE;
+			positionError = armSetpoint - armPosition;
 			accumulatedError = 0.0;
 			assignedPower = 0.0;
 			initializePID = false;
 		} else {
-			armPositionErrorLast = armPositionError;
+			armPositionErrorLast = positionError;
 			timePrevious = timeNow;
 			timeNow = Robot.systemTimer.get();
-			armPosition = pivotMotor.getSensorCollection().getQuadraturePosition() * DEGREES_PER_PULSE;
+			armPosition = pivoter.getSensorCollection().getQuadraturePosition() * DEGREES_PER_PULSE;
 			timeStep = timeNow - timePrevious;
 
-			armPositionError = armSetpoint - armPosition; // proportional
-			accumulatedError = accumulatedError + (armPositionErrorLast + armPositionError) / 2 * timeStep; // integral
-																											// using
-																											// trapezoidal
-																											// approximation
-			rateError = -pivotMotor.getSensorCollection().getQuadratureVelocity() * DEGREES_PER_PULSE * 10; // derivative
-																											// (*10
-																											// because
-																											// returns
-																											// counts/100ms)
+			positionError = armSetpoint - armPosition; // deg
+			accumulatedError = accumulatedError + (armPositionErrorLast + positionError) / 2 * timeStep; // deg*s
+			rateError = -pivoter.getSensorCollection().getQuadratureVelocity() * DEGREES_PER_PULSE * 10; // deg/s
 
-			assignedPower = PROPORTIONAL_GAIN * armPositionError + INTEGRAL_GAIN * accumulatedError
+			assignedPower = PROPORTIONAL_GAIN * positionError + INTEGRAL_GAIN * accumulatedError
 					+ DERIVATIVE_GAIN * rateError;
 		}
 		return assignedPower;
+	}
+
+	public void tuneControlGains() {
+		if (Robot.logitechJoystickL.getRawButton(7) == true) {
+			PROPORTIONAL_GAIN = PROPORTIONAL_GAIN + 1;
+		}
+		if (Robot.logitechJoystickL.getRawButton(8) == true) {
+			PROPORTIONAL_GAIN = PROPORTIONAL_GAIN - 1;
+		}
+		if (Robot.logitechJoystickL.getRawButton(9) == true) {
+			INTEGRAL_GAIN = INTEGRAL_GAIN + 1;
+		}
+		if (Robot.logitechJoystickL.getRawButton(10) == true) {
+			INTEGRAL_GAIN = INTEGRAL_GAIN - 1;
+		}
+		if (Robot.logitechJoystickL.getRawButton(11) == true) {
+			DERIVATIVE_GAIN = DERIVATIVE_GAIN + 1;
+		}
+		if (Robot.logitechJoystickL.getRawButton(12) == true) {
+			DERIVATIVE_GAIN = DERIVATIVE_GAIN - 1;
+		}
+		SmartDashboard.putNumber("Pivoter Kp", PROPORTIONAL_GAIN);
+		SmartDashboard.putNumber("Pivoter Ki", INTEGRAL_GAIN);
+		SmartDashboard.putNumber("Pivoter Kd", DERIVATIVE_GAIN);
 	}
 
 	public double findHoldingPower() {
@@ -107,22 +122,28 @@ public class ArmPivoter extends Thread implements Runnable {
 		return assignedPower;
 	}
 
-	public void findSetpoint() {
+	public void determineSetpoint() {
 
+		// Manual override
 		if (Robot.xboxController.getRawButton(Xbox.Start)
-				&& (Math.abs(Robot.xboxController.getRawAxis(Xbox.LAxisY)) > .075)) {
+				&& (Math.abs(Robot.xboxController.getRawAxis(Xbox.LAxisY)) > 0.075)) {
 			manualOveride = true;
-		} else if (Robot.xboxController.getRawButton(Xbox.X)) {
+			return;
+		}
+
+		// Determine setpoint
+		if (Robot.xboxController.getRawButton(Xbox.X)) {
 			manualOveride = false;
 			armSetpoint = 0;
-		} else {
+		} else if (Robot.xboxController.getRawAxis(Xbox.LAxisY) < -0.5) {
 			manualOveride = false;
-			if (Robot.xboxController.getRawAxis(Xbox.LAxisY) > .5) {
-				armSetpoint++;
-			} else if (Robot.xboxController.getRawAxis(Xbox.LAxisY) < -.5) {
-				armSetpoint--;
-			}
+			armSetpoint++;
+		} else if (Robot.xboxController.getRawAxis(Xbox.LAxisY) > 0.5) {
+			manualOveride = false;
+			armSetpoint--;
 		}
+
+		// Limit setpoint range
 		if (armSetpoint > UPPER_LIMIT) {
 			armSetpoint = UPPER_LIMIT;
 		} else if (armSetpoint < LOWER_LIMIT) {
@@ -133,37 +154,26 @@ public class ArmPivoter extends Thread implements Runnable {
 
 	public void assignMotorPower(double staticPower, double activePower) {
 		if (manualOveride) {
-
+			pivoter.set(ControlMode.PercentOutput, -Robot.xboxController.getRawAxis(Xbox.LAxisY));
 		} else {
-			pivotMotor.set(ControlMode.PercentOutput, Robot.xboxController.getRawAxis(Xbox.LAxisY));
+			pivoter.set(ControlMode.PercentOutput, (staticPower + activePower));
 		}
-		pivotMotor.set(ControlMode.PercentOutput, (staticPower + activePower));
 	}
 
-	public void giveReadouts() {
+	public void commandSetpoint(double setPoint) {
+		armSetpoint = setPoint;
+	}
+
+	public void updateTelemetry() {
 		SmartDashboard.putNumber("Arm Angle Commanded", armSetpoint);
 		SmartDashboard.putNumber("Arm Angle Estimated", armPosition);
 	}
 
-	public void performMainProcessing() {
-		findSetpoint();
-		assignMotorPower(findHoldingPower(), computeMovementPower());
-		giveReadouts();
-	}
-
-	public void performMainProcessing(double setPoint) {
-		armSetpoint = setPoint;
-		assignMotorPower(findHoldingPower(), computeMovementPower());
-		giveReadouts();
-	}
-
-	public void updateTelemetry() {
-		SmartDashboard.putNumber("Arm Angle:", armPosition);
-	}
-
 	public void run() {
 		while (true) {
-			performMainProcessing();
+			tuneControlGains();
+			determineSetpoint();
+			assignMotorPower(findHoldingPower(), computeMovementPower());
 			updateTelemetry();
 			Timer.delay(0.05);
 		}

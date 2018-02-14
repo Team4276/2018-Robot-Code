@@ -390,7 +390,7 @@ public class AutoSequences {
 			}
 			// State processing
 
-			Robot.armPivoter.performMainProcessing(armDown);
+			Robot.armPivoter.commandSetpoint(armDown);
 			// State exit
 			if (phaseTimer.isExpired()) {
 				performStateExit();

@@ -8,26 +8,28 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Manipulator {
-	DoubleSolenoid grabberSolenoid;
-	Toggler rtToggler;
-	final double TRIGGER_THRESHOLD = -0.5;
-	boolean manipulatorCommandedOpen;
-
+	final double TRIGGER_THRESHOLD = 0.5;
 	final Value CLOSED = DoubleSolenoid.Value.kReverse;
 	final Value OPEN = DoubleSolenoid.Value.kForward;
-	Value currentState = null;
+
+	DoubleSolenoid solenoid;
+	Toggler rtToggler;
+	
+	boolean manipulatorCommandedOpen;
+	Value manipulatorValue;
+	boolean manipulatorIsOpen;
 
 	public Manipulator(int PCMPort1, int PCMPort2) {
-		grabberSolenoid = new DoubleSolenoid(PCMPort1, PCMPort2);
+		solenoid = new DoubleSolenoid(PCMPort1, PCMPort2);
 		rtToggler = new Toggler(Xbox.RT);
 	}
 
 	public void openManipulator() {
-		grabberSolenoid.set(OPEN);
+		solenoid.set(OPEN);
 	}
 
 	public void closeManipulator() {
-		grabberSolenoid.set(CLOSED);
+		solenoid.set(CLOSED);
 	}
 
 	public void performMainProcessing() {
@@ -37,15 +39,16 @@ public class Manipulator {
 
 		// open or close solenoid depending on desired manipulator position
 		if (manipulatorCommandedOpen) {
-			grabberSolenoid.set(OPEN);
+			solenoid.set(OPEN);
 		} else {
-			grabberSolenoid.set(CLOSED);
+			solenoid.set(CLOSED);
 		}
 		updateTelemetry();
 	}
 
 	public void updateTelemetry() {
-		
-		SmartDashboard.putBoolean("manipulator open", manipulatorCommandedOpen);
+		manipulatorValue = solenoid.get();
+		manipulatorIsOpen = (manipulatorValue == OPEN);
+		SmartDashboard.putBoolean("manipulator open", manipulatorIsOpen);
 	}
 }
