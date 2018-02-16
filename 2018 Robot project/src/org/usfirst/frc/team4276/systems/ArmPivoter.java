@@ -29,6 +29,9 @@ public class ArmPivoter extends Thread implements Runnable {
 	double armPositionErrorLast = 0;
 	private double accumulatedError = 0;
 	private double rateError = 0;
+	private double staticPower = 0;
+	private double activePower = 0;
+	private double commandedPower = 0;
 
 	private boolean manualOveride = false;
 	private boolean initializePID = true;
@@ -36,26 +39,29 @@ public class ArmPivoter extends Thread implements Runnable {
 	private double timePrevious;
 	private double timeStep;
 
+	private double offset = 0;
 	double PROPORTIONAL_GAIN = 0;
 	double INTEGRAL_GAIN = 0;
 	double DERIVATIVE_GAIN = 0;
-	final double TORQUE_GAIN = 0;
+	double TORQUE_GAIN = 0.12;
 	final double UPPER_LIMIT = 90;
 	final double LOWER_LIMIT = -90;
-	final double DEGREES_PER_PULSE = (360 / 1024) / 2; // needs testing: 360
-														// deg/rev | 1024
-														// pulse/rev | 2:1
-														// reduction
+	final double DEGREES_PER_PULSE = 0.0455;// 1/22
+	// final double DEGREES_PER_PULSE = (360 / 1024) / 2; // needs testing: 360
+	// deg/rev | 1024
+	// pulse/rev | 2:1
+	// reduction
 
 	public ArmPivoter(int pivoterCANPort) {
 		pivoter = new TalonSRX(pivoterCANPort);
+		offset = 90 - pivoter.getSensorCollection().getQuadraturePosition() * DEGREES_PER_PULSE;
 	}
 
 	private double computeMovementPower() {
 		double assignedPower;
 		if (initializePID == true) {
 			timeNow = Robot.systemTimer.get();
-			armPosition = pivoter.getSensorCollection().getQuadraturePosition() * DEGREES_PER_PULSE;
+			armPosition = pivoter.getSensorCollection().getQuadraturePosition() * DEGREES_PER_PULSE + offset;
 			positionError = armSetpoint - armPosition;
 			accumulatedError = 0.0;
 			assignedPower = 0.0;
@@ -64,7 +70,7 @@ public class ArmPivoter extends Thread implements Runnable {
 			armPositionErrorLast = positionError;
 			timePrevious = timeNow;
 			timeNow = Robot.systemTimer.get();
-			armPosition = pivoter.getSensorCollection().getQuadraturePosition() * DEGREES_PER_PULSE;
+			armPosition = pivoter.getSensorCollection().getQuadraturePosition() * DEGREES_PER_PULSE + offset;
 			timeStep = timeNow - timePrevious;
 
 			positionError = armSetpoint - armPosition; // deg
@@ -78,24 +84,31 @@ public class ArmPivoter extends Thread implements Runnable {
 	}
 
 	public void tuneControlGains() {
+		if (Robot.logitechJoystickL.getRawButton(5) == true) {
+			TORQUE_GAIN = TORQUE_GAIN + 1e-2;
+		}
+		if (Robot.logitechJoystickL.getRawButton(3) == true) {
+			TORQUE_GAIN = TORQUE_GAIN - 1e-2;
+		}
 		if (Robot.logitechJoystickL.getRawButton(7) == true) {
-			PROPORTIONAL_GAIN = PROPORTIONAL_GAIN + 1;
+			PROPORTIONAL_GAIN = PROPORTIONAL_GAIN + 1e-2;
 		}
 		if (Robot.logitechJoystickL.getRawButton(8) == true) {
-			PROPORTIONAL_GAIN = PROPORTIONAL_GAIN - 1;
+			PROPORTIONAL_GAIN = PROPORTIONAL_GAIN - 1e-2;
 		}
 		if (Robot.logitechJoystickL.getRawButton(9) == true) {
-			INTEGRAL_GAIN = INTEGRAL_GAIN + 1;
+			INTEGRAL_GAIN = INTEGRAL_GAIN + 1e-2;
 		}
 		if (Robot.logitechJoystickL.getRawButton(10) == true) {
-			INTEGRAL_GAIN = INTEGRAL_GAIN - 1;
+			INTEGRAL_GAIN = INTEGRAL_GAIN - 1e-2;
 		}
 		if (Robot.logitechJoystickL.getRawButton(11) == true) {
-			DERIVATIVE_GAIN = DERIVATIVE_GAIN + 1;
+			DERIVATIVE_GAIN = DERIVATIVE_GAIN + 1e-2;
 		}
 		if (Robot.logitechJoystickL.getRawButton(12) == true) {
-			DERIVATIVE_GAIN = DERIVATIVE_GAIN - 1;
+			DERIVATIVE_GAIN = DERIVATIVE_GAIN - 1e-2;
 		}
+		SmartDashboard.putNumber("Pivoter Ktq", TORQUE_GAIN);
 		SmartDashboard.putNumber("Pivoter Kp", PROPORTIONAL_GAIN);
 		SmartDashboard.putNumber("Pivoter Ki", INTEGRAL_GAIN);
 		SmartDashboard.putNumber("Pivoter Kd", DERIVATIVE_GAIN);
@@ -117,7 +130,9 @@ public class ArmPivoter extends Thread implements Runnable {
 		double xCM = .203; // placeholder
 		double theta = Math.PI * armPosition / 180;
 
-		assignedPower = TORQUE_GAIN * (mass * (gravity + acceleration) * xCM * Math.cos(theta));
+		// assignedPower = TORQUE_GAIN * (mass * (gravity + acceleration) * xCM *
+		// Math.cos(theta));
+		assignedPower = TORQUE_GAIN * Math.cos(theta);
 
 		return assignedPower;
 	}
@@ -128,6 +143,7 @@ public class ArmPivoter extends Thread implements Runnable {
 		if (Robot.xboxController.getRawButton(Xbox.Start)
 				&& (Math.abs(Robot.xboxController.getRawAxis(Xbox.LAxisY)) > 0.075)) {
 			manualOveride = true;
+			commandedPower = -Robot.xboxController.getRawAxis(Xbox.LAxisY);
 			return;
 		}
 
@@ -150,14 +166,11 @@ public class ArmPivoter extends Thread implements Runnable {
 			armSetpoint = LOWER_LIMIT;
 		}
 
-	}
+		// Compute commanded power
+		staticPower = findHoldingPower();
+		activePower = computeMovementPower();
+		commandedPower = staticPower + activePower;
 
-	public void assignMotorPower(double staticPower, double activePower) {
-		if (manualOveride) {
-			pivoter.set(ControlMode.PercentOutput, -Robot.xboxController.getRawAxis(Xbox.LAxisY));
-		} else {
-			pivoter.set(ControlMode.PercentOutput, (staticPower + activePower));
-		}
 	}
 
 	public void commandSetpoint(double setPoint) {
@@ -165,15 +178,15 @@ public class ArmPivoter extends Thread implements Runnable {
 	}
 
 	public void updateTelemetry() {
-		SmartDashboard.putNumber("Arm Angle Commanded", armSetpoint);
-		SmartDashboard.putNumber("Arm Angle Estimated", armPosition);
+		SmartDashboard.putNumber("Commanded Arm Angle", armSetpoint);
+		SmartDashboard.putNumber("Estimated Arm Angle", armPosition);
 	}
 
 	public void run() {
 		while (true) {
 			tuneControlGains();
 			determineSetpoint();
-			assignMotorPower(findHoldingPower(), computeMovementPower());
+			pivoter.set(ControlMode.PercentOutput, commandedPower);
 			updateTelemetry();
 			Timer.delay(0.05);
 		}
