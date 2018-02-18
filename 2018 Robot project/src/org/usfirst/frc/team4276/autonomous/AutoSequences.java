@@ -364,12 +364,12 @@ public class AutoSequences {
 			if (setRoutine == MID_TO_LEFT_SWITCH || setRoutine == MID_TO_RIGHT_SWITCH || setRoutine == LEFT_SWITCH
 					|| setRoutine == RIGHT_SWITCH) {
 				// bring elevator to switch scoring height
-				Robot.elevator.commandedHeight = Robot.elevator.SETPOINT_SWITCH;
+				Robot.elevator.commandToSwitch();
 
 			} else if (setRoutine == LEFT_SCALE || setRoutine == RIGHT_SCALE) {
 
 				// bring elevator to scale scoring height
-				Robot.elevator.commandedHeight = Robot.elevator.SETPOINT_SCALE;
+				Robot.elevator.commandToScale();
 
 			} else {
 				SmartDashboard.putNumber("Auto Error", ROUTINE_DETERMINE_ERROR);
@@ -481,7 +481,7 @@ public class AutoSequences {
 				performStateEntry = false;
 			}
 			// State processing
-			Robot.elevator.commandedHeight = Robot.elevator.SETPOINT_BOTTOM;
+			Robot.elevator.commandToBottom();
 
 			// State exit
 			if (phaseTimer.isExpired()) {
