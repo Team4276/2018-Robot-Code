@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.Timer;
 import org.usfirst.frc.team4276.autonomous.PositionFinder;
-import org.usfirst.frc.team4276.autonomous.AutoSequences;
+import org.usfirst.frc.team4276.autonomous.AutoMain;
 import org.usfirst.frc.team4276.autonomous.RoutineSelector;
 import org.usfirst.frc.team4276.systems.ArmPivoter;
 import org.usfirst.frc.team4276.systems.Climber;
@@ -30,7 +30,7 @@ public class Robot extends SampleRobot {
 
 	public static PositionFinder positionFinder;
 	public static RoutineSelector routineSelector;
-	public AutoSequences autoSequences;
+	public AutoMain autoMain;
 
 	public Robot() {
 		// Master Timer
@@ -55,7 +55,7 @@ public class Robot extends SampleRobot {
 		routineSelector = new RoutineSelector();
 		positionFinder = new PositionFinder(RoboRioPorts.DIO_DRIVE_LEFT_A, RoboRioPorts.DIO_DRIVE_LEFT_B,
 				RoboRioPorts.DIO_DRIVE_RIGHT_A, RoboRioPorts.DIO_DRIVE_RIGHT_B);
-		autoSequences = new AutoSequences();
+		autoMain = new AutoMain();
 	}
 
 	public void robotInit() {
@@ -73,11 +73,11 @@ public class Robot extends SampleRobot {
 		armPivoter.initializeThread();
 		elevator.initializeThread();
 		while (isAutonomous() && isEnabled()) {
-			double desiredCoordinate[] = { 5, 0 };
+			// double desiredCoordinate[] = { 8, -4 };
 			// driveTrain.rotateToHeading(90);
-			driveTrain.rotateToCoordinate(desiredCoordinate);
+			// driveTrain.rotateToCoordinate(desiredCoordinate);
 			// if (driveTrain.driveToCoordinate(desiredCoordinate));
-			// autoSequences.loop();
+			autoMain.loop();
 			Timer.delay(0.05);
 		}
 	}

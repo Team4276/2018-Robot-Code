@@ -23,14 +23,15 @@ public class PositionFinder extends Thread implements Runnable {
 	static double currentY = 0;
 
 	public boolean breakLoop = false;
+	private static boolean skipXYAssignment = false;
 
 	public PositionFinder(int encoder1A, int encoder1B, int encoder2A, int encoder2B) {
 
 		driveEncoderL = new Encoder(encoder1A, encoder1B);
 		driveEncoderR = new Encoder(encoder2A, encoder2B);
-		
-		driveEncoderL.setDistancePerPulse(10/12644.375);
-		driveEncoderR.setDistancePerPulse(10/12644.375);
+
+		driveEncoderL.setDistancePerPulse(10 / 12644.375);
+		driveEncoderR.setDistancePerPulse(10 / 12644.375);
 
 		robotIMU = new ADIS16448_IMU();
 
@@ -82,6 +83,8 @@ public class PositionFinder extends Thread implements Runnable {
 
 	public static void setStartPoint(double XY[]) {
 		previousXY = XY;
+		// won't be overwritten
+		skipXYAssignment = true;
 	}
 
 	public void kill() {
@@ -101,8 +104,14 @@ public class PositionFinder extends Thread implements Runnable {
 	public void run() {
 
 		while (true) {
-
-			previousXY = currentXY;
+			// if set to skip overwrite
+			if (skipXYAssignment) {
+				// only skip once
+				skipXYAssignment = false;
+			} else {
+				// save last recorded position
+				previousXY = currentXY;
+			}
 			updateHeading();
 			updatePosition();
 			updateSmartDashboard();

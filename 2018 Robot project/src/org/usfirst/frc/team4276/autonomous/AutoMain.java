@@ -6,11 +6,11 @@ import org.usfirst.frc.team4276.utilities.SoftwareTimer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class AutoSequences {
+public class AutoMain {
 
 	SoftwareTimer phaseTimer;
 	// constants
-	private double armDown = 0; // straight out
+	private final double ARM_OUT = 0; // straight out
 
 	// gamedata values
 	public int switchValue = 0;
@@ -38,7 +38,7 @@ public class AutoSequences {
 	static final int LOWER_ELEVATOR = 10;
 	static final int EXIT = 11;
 
-	static int currentState;
+	static int currentState = INIT; // always runs init first
 	String currentStateName;
 
 	// routines
@@ -59,9 +59,8 @@ public class AutoSequences {
 	// currentState enabled array
 	static boolean[] stateEnabled = new boolean[EXIT + 1];
 
-	public AutoSequences() {
+	public AutoMain() {
 		phaseTimer = new SoftwareTimer();
-
 	}
 
 	public double[] getStartPosition() {
@@ -211,7 +210,7 @@ public class AutoSequences {
 
 	// Main State Variables
 	boolean loop;
-	boolean performStateEntry;
+	boolean performStateEntry = true;
 
 	public void loop() {
 		switch (currentState) {
@@ -221,7 +220,10 @@ public class AutoSequences {
 			if (performStateEntry) {
 
 				PositionFinder.setStartPoint(getStartPosition());
-				Robot.driveTrain.setLoGear();
+				planRoute();
+				defineStateEnabledStatus();
+
+				Robot.driveTrain.setHiGear();
 				Robot.manipulator.closeManipulator();
 				phaseTimer.setTimer(0.2);
 				performStateEntry = false;
@@ -230,10 +232,10 @@ public class AutoSequences {
 
 			// State processing
 
-			planRoute();
-			defineStateEnabledStatus();
 			// State exit
 			if (phaseTimer.isExpired()) {
+				Robot.elevator.commandedHeight = Robot.elevator.SETPOINT_PREP;
+				Robot.armPivoter.commandSetpoint(ARM_OUT);
 				performStateExit();
 			}
 
@@ -364,12 +366,12 @@ public class AutoSequences {
 			if (setRoutine == MID_TO_LEFT_SWITCH || setRoutine == MID_TO_RIGHT_SWITCH || setRoutine == LEFT_SWITCH
 					|| setRoutine == RIGHT_SWITCH) {
 				// bring elevator to switch scoring height
-				Robot.elevator.commandToSwitch();
+				Robot.elevator.commandedHeight = Robot.elevator.SETPOINT_SWITCH;
 
 			} else if (setRoutine == LEFT_SCALE || setRoutine == RIGHT_SCALE) {
 
 				// bring elevator to scale scoring height
-				Robot.elevator.commandToScale();
+				Robot.elevator.commandedHeight = Robot.elevator.SETPOINT_SCALE;
 
 			} else {
 				SmartDashboard.putNumber("Auto Error", ROUTINE_DETERMINE_ERROR);
@@ -390,7 +392,7 @@ public class AutoSequences {
 			}
 			// State processing
 
-			Robot.armPivoter.commandSetpoint(armDown);
+			Robot.armPivoter.commandSetpoint(ARM_OUT);
 			// State exit
 			if (phaseTimer.isExpired()) {
 				performStateExit();
@@ -481,7 +483,7 @@ public class AutoSequences {
 				performStateEntry = false;
 			}
 			// State processing
-			Robot.elevator.commandToBottom();
+			Robot.elevator.commandedHeight = Robot.elevator.SETPOINT_BOTTOM;
 
 			// State exit
 			if (phaseTimer.isExpired()) {

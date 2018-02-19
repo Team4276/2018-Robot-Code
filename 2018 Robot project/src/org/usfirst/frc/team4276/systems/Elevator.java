@@ -30,10 +30,11 @@ public class Elevator extends Thread implements Runnable {
 	private final double MAX_HEIGHT_UPPER = 6.125; // ft
 
 	// Constants - General
-	private final double STARTING_HEIGHT = 1.7; // ft
-	private final double SETPOINT_SCALE = 5.75; // ft
-	private final double SETPOINT_SWITCH = 3; // ft
-	private final double SETPOINT_BOTTOM = 0; // ft
+	public final double STARTING_HEIGHT = 1.7; // ft
+	public final double SETPOINT_PREP = 2; // ft
+	public final double SETPOINT_SCALE = 5.75; // ft
+	public final double SETPOINT_SWITCH = 3; // ft
+	public final double SETPOINT_BOTTOM = 0; // ft
 	private final double SETPOINT_INCREMENT = .2; // ft
 	private final double OVERRIDE_INCREMENT = 0.05; // 5%
 	private final double HEIGHT_PER_PULSE = -1.562 * 1e-4; // 1/6400
@@ -46,7 +47,7 @@ public class Elevator extends Thread implements Runnable {
 	private boolean manualOverrideIsEngaged;
 	private double encoderOffset = 0;
 	private double estimatedHeight = 0;
-	private double commandedHeight = STARTING_HEIGHT;
+	public double commandedHeight = STARTING_HEIGHT;
 	private double manualPower = 0;
 	private double staticPower = 0;
 	private double activePower = 0;
@@ -139,11 +140,12 @@ public class Elevator extends Thread implements Runnable {
 			heightError = commandedHeight - estimatedHeight; // height
 			accumulatedError = accumulatedError + (heightErrorLast + heightError) / 2 * timeStep; // height*sec
 			rateError = -elevatorDriverMain.getSensorCollection().getQuadratureVelocity() * 10 * HEIGHT_PER_PULSE; // height/sec
-			
+
 			// For large height errors, follow coast speed until close to target
 			if (heightError > HEIGHT_THRESHOLD) {
 				heightError = HEIGHT_THRESHOLD; // limiting to 2 ft
-				rateError = HEIGHT_COAST_RATE + rateError; // coast speed = 1 ft/s
+				rateError = HEIGHT_COAST_RATE + rateError; // coast speed = 1
+															// ft/s
 			}
 
 			// Compute PID active power
@@ -262,7 +264,8 @@ public class Elevator extends Thread implements Runnable {
 
 	public void run() {
 		while (true) {
-			tuneControlGains(); // for gain tuning only - COMMENT THIS LINE OUT FOR
+			tuneControlGains(); // for gain tuning only - COMMENT THIS LINE OUT
+								// FOR
 			// COMPETITION
 			manualOverrideToggler.updateMechanismState();
 			manualOverrideIsEngaged = manualOverrideToggler.getMechanismState();
