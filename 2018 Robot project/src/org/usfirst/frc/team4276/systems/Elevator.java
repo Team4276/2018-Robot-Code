@@ -238,6 +238,10 @@ public class Elevator extends Thread implements Runnable {
 	}
 
 	private void updateTelemetry() {
+		SmartDashboard.putNumber("Elevator Combined current Draw",
+				elevatorDriverMain.getOutputCurrent() + elevatorDriverFollow.getOutputCurrent());
+		SmartDashboard.putNumber("Elevator 1 current Draw", elevatorDriverMain.getOutputCurrent());
+		SmartDashboard.putNumber("Elevator 2 current Draw", elevatorDriverFollow.getOutputCurrent());
 		SmartDashboard.putNumber("Commanded arm height", commandedHeight);
 		SmartDashboard.putNumber("Estimated arm height", estimatedHeight);
 		SmartDashboard.putBoolean("Elevator override", manualOverrideIsEngaged);
