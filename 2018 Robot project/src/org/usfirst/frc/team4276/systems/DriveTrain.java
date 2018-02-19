@@ -69,7 +69,7 @@ public class DriveTrain {
 	}
 
 	public void getJoystickValues() {
-		final double DRIVE_PROFILE_EXPONENT = 5 / 2; // must be > 1
+		final double DRIVE_PROFILE_EXPONENT = 3 / 2; // must be > 1
 		final double JOYSTICK_DEADBAND = 0.2; // must be positive
 
 		if (Robot.logitechJoystickL.getY() > JOYSTICK_DEADBAND) {

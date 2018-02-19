@@ -8,12 +8,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.usfirst.frc.team4276.robot.Robot;
 import org.usfirst.frc.team4276.utilities.Xbox;
+import org.usfirst.frc.team4276.utilities.SoftwareTimer;
 import org.usfirst.frc.team4276.utilities.Toggler;
 
 public class ArmPivoter extends Thread implements Runnable {
 
 	private TalonSRX pivoter;
 	private Toggler manualOverrideToggler;
+	private SoftwareTimer armTimer;
 
 	// Constants
 	private double STATIC_GAIN = 0.12;
@@ -21,13 +23,16 @@ public class ArmPivoter extends Thread implements Runnable {
 	private double INTEGRAL_GAIN = 100 * 1e-6;
 	private double DERIVATIVE_GAIN = -10 * 1e-6;
 	private final double STARTING_ANGLE = -85;
-	private final double SETPOINT_INCREMENT = 5; // deg
-	private final double MAX_POWER = 0.7;
-	private final double UPPER_LIMIT = 80;
-	private final double LOWER_LIMIT = -80;
+	private final double SETPOINT_INCREMENT = 10; // deg
+	private final double MAX_POWER = 1;
+	private final double UPPER_LIMIT = 85;
+	private final double LOWER_LIMIT = -85;
 	private final double DEGREES_PER_PULSE = 5.612 * 1e-4;// 1/22/81
+	private final double ANGLE_THRESHOLD = 90; // deg
+	private final double ANGLE_COAST_RATE = 90; // deg/s
 
 	// General parameters
+	private boolean delayInit = true;
 	private boolean manualOverrideIsEngaged = false;
 	private double encoderOffset = 0;
 	private double estimatedAngle = 0; // deg
@@ -50,6 +55,7 @@ public class ArmPivoter extends Thread implements Runnable {
 	public ArmPivoter(int pivoterCANPort) {
 		pivoter = new TalonSRX(pivoterCANPort);
 		manualOverrideToggler = new Toggler(Xbox.Start);
+		armTimer = new SoftwareTimer();
 		encoderOffset = STARTING_ANGLE - pivoter.getSensorCollection().getQuadraturePosition() * DEGREES_PER_PULSE;
 	}
 
@@ -90,12 +96,27 @@ public class ArmPivoter extends Thread implements Runnable {
 			estimatedAngle = pivoter.getSensorCollection().getQuadraturePosition() * DEGREES_PER_PULSE + encoderOffset;
 			timeStep = timeNow - timePrevious;
 
+			// Compute control errors
 			angleError = commandedAngle - estimatedAngle; // deg
 			accumulatedError = accumulatedError + (angleErrorLast + angleError) / 2 * timeStep; // deg*s
 			rateError = -pivoter.getSensorCollection().getQuadratureVelocity() * DEGREES_PER_PULSE * 10; // deg/s
-			SmartDashboard.putNumber("arm angle velocity", -rateError);
+
+			// For large height errors, follow coast speed until close to target
+			if (angleError > ANGLE_THRESHOLD) {
+				angleError = ANGLE_THRESHOLD; // limiting to 90 deg
+				rateError = ANGLE_COAST_RATE + rateError; // coast speed = 90 deg/s
+			}
+
+			// Compute PID active power
 			activePower = PROPORTIONAL_GAIN * angleError + INTEGRAL_GAIN * accumulatedError
 					+ DERIVATIVE_GAIN * rateError;
+			
+			// Engage manual override if CAN bus is lost
+			if (pivoter.getSensorCollection().getQuadraturePosition() == 0
+					&& pivoter.getSensorCollection().getQuadratureVelocity() == 0) {
+				manualOverrideToggler.setMechanismState(true);
+				activePower = 0;
+			}
 		}
 	}
 
@@ -172,6 +193,17 @@ public class ArmPivoter extends Thread implements Runnable {
 		// commandedPower = 0;
 		initializePID = true;
 		accumulatedError = 0.0;
+	}
+
+	public void commandSetpoint(double setpoint, double delay) {
+		if (delayInit) {
+			armTimer.setTimer(0.1);
+			delayInit = false;
+		}
+		if (armTimer.isExpired()) {
+			commandedAngle = setpoint;
+			delayInit = true;
+		}
 	}
 
 	public void run() {

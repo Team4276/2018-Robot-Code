@@ -1,5 +1,6 @@
 package org.usfirst.frc.team4276.systems;
 
+import org.usfirst.frc.team4276.robot.Robot;
 import org.usfirst.frc.team4276.utilities.Toggler;
 import org.usfirst.frc.team4276.utilities.Xbox;
 
@@ -14,7 +15,7 @@ public class Manipulator {
 
 	DoubleSolenoid solenoid;
 	Toggler rtToggler;
-	
+
 	boolean manipulatorCommandedOpen;
 	Value manipulatorValue;
 	boolean manipulatorIsOpen;
@@ -37,18 +38,26 @@ public class Manipulator {
 		rtToggler.updateMechanismState(TRIGGER_THRESHOLD);
 		manipulatorCommandedOpen = rtToggler.getMechanismState();
 
+		manipulatorValue = solenoid.get();
+		manipulatorIsOpen = (manipulatorValue == OPEN);
+
 		// open or close solenoid depending on desired manipulator position
-		if (manipulatorCommandedOpen) {
+
+		if (Robot.xboxController.getRawAxis(Xbox.LT) > TRIGGER_THRESHOLD) {
+			if (manipulatorIsOpen) {
+				solenoid.set(CLOSED);
+			}
+			Robot.armPivoter.commandSetpoint(80);
+		} else if (manipulatorCommandedOpen) {
 			solenoid.set(OPEN);
 		} else {
 			solenoid.set(CLOSED);
 		}
+
 		updateTelemetry();
 	}
 
 	public void updateTelemetry() {
-		manipulatorValue = solenoid.get();
-		manipulatorIsOpen = (manipulatorValue == OPEN);
 		SmartDashboard.putBoolean("manipulator open", manipulatorIsOpen);
 	}
 }

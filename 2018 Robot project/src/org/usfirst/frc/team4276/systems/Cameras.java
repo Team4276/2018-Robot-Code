@@ -22,7 +22,7 @@ public class Cameras {
 		mainCamera = CameraServer.getInstance().startAutomaticCapture(0);
 		mainCamera.setResolution(MAIN_RES_X, MAIN_RES_Y);
 		mainCamera.setFPS(MAIN_FPS);
-		mainCamera.setExposureManual(MAIN_EXPOSURE);
+		//mainCamera.setExposureManual(MAIN_EXPOSURE);
 
 		armCamera = CameraServer.getInstance().startAutomaticCapture(1);
 		armCamera.setResolution(ARM_RES_X, ARM_RES_Y);

@@ -17,9 +17,9 @@ public class Elevator extends Thread implements Runnable {
 
 	// Constants - Lower Rail
 	private double STATIC_GAIN_LOWER = 0.08;
-	private double KP_LOWER = 750 * 1e-3;
-	private double KI_LOWER = 1 * 1e-3;
-	private double KD_LOWER = 8 * 1e-3;
+	private double KP_LOWER = 540 * 1e-3;
+	private double KI_LOWER = 0;
+	private double KD_LOWER = 15 * 1e-3;
 	private final double MAX_HEIGHT_LOWER = 2.625; // ft
 
 	// Constants - Upper Rail
@@ -37,8 +37,10 @@ public class Elevator extends Thread implements Runnable {
 	private final double SETPOINT_INCREMENT = .2; // ft
 	private final double OVERRIDE_INCREMENT = 0.05; // 5%
 	private final double HEIGHT_PER_PULSE = -1.562 * 1e-4; // 1/6400
-	private final double MAX_POWER_UP = 0.7;
+	private final double MAX_POWER_UP = 1;
 	private final double MAX_POWER_DOWN = 0.1;
+	private final double HEIGHT_THRESHOLD = 2; // ft
+	private final double HEIGHT_COAST_RATE = 1; // ft/s
 
 	// General parameters
 	private boolean manualOverrideIsEngaged;
@@ -137,6 +139,12 @@ public class Elevator extends Thread implements Runnable {
 			heightError = commandedHeight - estimatedHeight; // height
 			accumulatedError = accumulatedError + (heightErrorLast + heightError) / 2 * timeStep; // height*sec
 			rateError = -elevatorDriverMain.getSensorCollection().getQuadratureVelocity() * 10 * HEIGHT_PER_PULSE; // height/sec
+			
+			// For large height errors, follow coast speed until close to target
+			if (heightError > HEIGHT_THRESHOLD) {
+				heightError = HEIGHT_THRESHOLD; // limiting to 2 ft
+				rateError = HEIGHT_COAST_RATE + rateError; // coast speed = 1 ft/s
+			}
 
 			// Compute PID active power
 			if (estimatedHeight < MAX_HEIGHT_LOWER) {
@@ -145,6 +153,13 @@ public class Elevator extends Thread implements Runnable {
 			} else {
 				// PID for upper rail
 				activePower = (KP_UPPER * heightError) + (KI_UPPER * accumulatedError) + (KD_UPPER * rateError);
+			}
+
+			// Engage manual override if CAN bus is lost
+			if (elevatorDriverMain.getSensorCollection().getQuadraturePosition() == 0
+					&& elevatorDriverMain.getSensorCollection().getQuadratureVelocity() == 0) {
+				manualOverrideToggler.setMechanismState(true);
+				activePower = 0;
 			}
 		}
 	}

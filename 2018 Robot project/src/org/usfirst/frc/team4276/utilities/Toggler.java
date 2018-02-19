@@ -60,6 +60,10 @@ public class Toggler {
 			}
 		}
 	}
+	
+	public void setMechanismState(boolean desiredState) {
+		state = desiredState;
+	}
 
 	public boolean getMechanismState() {
 		return state;
