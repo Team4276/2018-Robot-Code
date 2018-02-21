@@ -24,9 +24,9 @@ public class Elevator extends Thread implements Runnable {
 
 	// Constants - Upper Rail
 	private double STATIC_GAIN_UPPER = STATIC_GAIN_LOWER;
-	private double KP_UPPER = KP_LOWER;
+	private double KP_UPPER = 430 * 1e-3;
 	private double KI_UPPER = KI_LOWER;
-	private double KD_UPPER = KD_LOWER;
+	private double KD_UPPER = 25 * 1e-3;
 	private final double MAX_HEIGHT_UPPER = 6.125; // ft
 
 	// Constants - General
@@ -38,7 +38,7 @@ public class Elevator extends Thread implements Runnable {
 	private final double SETPOINT_INCREMENT = .2; // ft
 	private final double OVERRIDE_INCREMENT = 0.05; // 5%
 	private final double HEIGHT_PER_PULSE = -1.562 * 1e-4; // 1/6400
-	private final double MAX_POWER_UP = 1;
+	private final double MAX_POWER_UP = 0.7;
 	private final double MAX_POWER_DOWN = 0.1;
 	private final double HEIGHT_THRESHOLD = 2; // ft
 	private final double HEIGHT_COAST_RATE = 1; // ft/s
@@ -238,10 +238,8 @@ public class Elevator extends Thread implements Runnable {
 	}
 
 	private void updateTelemetry() {
-		SmartDashboard.putNumber("Elevator Combined current Draw",
-				elevatorDriverMain.getOutputCurrent() + elevatorDriverFollow.getOutputCurrent());
-		SmartDashboard.putNumber("Elevator 1 current Draw", elevatorDriverMain.getOutputCurrent());
-		SmartDashboard.putNumber("Elevator 2 current Draw", elevatorDriverFollow.getOutputCurrent());
+		SmartDashboard.putNumber("current draw elevator 1", elevatorDriverMain.getOutputCurrent());
+		SmartDashboard.putNumber("current draw elevator 2", elevatorDriverFollow.getOutputCurrent());
 		SmartDashboard.putNumber("Commanded arm height", commandedHeight);
 		SmartDashboard.putNumber("Estimated arm height", estimatedHeight);
 		SmartDashboard.putBoolean("Elevator override", manualOverrideIsEngaged);

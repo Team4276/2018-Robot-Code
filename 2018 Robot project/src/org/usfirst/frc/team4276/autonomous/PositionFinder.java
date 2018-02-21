@@ -96,10 +96,6 @@ public class PositionFinder extends Thread implements Runnable {
 	}
 
 	private void updateSmartDashboard() {
-		SmartDashboard.putNumber("Elevator Combined current Draw",
-				elevatorDriverMain.getOutputCurrent() + elevatorDriverFollow.getOutputCurrent());
-		SmartDashboard.putNumber("Elevator 1 current Draw", elevatorDriverMain.getOutputCurrent());
-		SmartDashboard.putNumber("Elevator 2 current Draw", elevatorDriverFollow.getOutputCurrent());
 		SmartDashboard.putNumber("Heading", currentHeadingDeg);
 		SmartDashboard.putNumber("Robot X:", currentXY[0]);
 		SmartDashboard.putNumber("Robot Y:", currentXY[1]);
