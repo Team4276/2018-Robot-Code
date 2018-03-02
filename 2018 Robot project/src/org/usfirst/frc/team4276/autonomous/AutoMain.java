@@ -244,7 +244,9 @@ public class AutoMain {
 		case DRIVE_OFF_WALL:
 			currentStateName = "Drive Off Wall";
 			// State entry
+			
 			if (performStateEntry) {
+				
 				phaseTimer.setTimer(4);
 				performStateEntry = false;
 			}
@@ -292,7 +294,7 @@ public class AutoMain {
 
 			// State entry
 			if (performStateEntry) {
-				phaseTimer.setTimer(4);
+				phaseTimer.setTimer(5);
 				performStateEntry = false;
 			}
 			// State processing
@@ -460,7 +462,7 @@ public class AutoMain {
 			// State entry
 			if (performStateEntry) {
 
-				phaseTimer.setTimer(2);
+				phaseTimer.setTimer(1);
 				performStateEntry = false;
 			}
 			// State processing

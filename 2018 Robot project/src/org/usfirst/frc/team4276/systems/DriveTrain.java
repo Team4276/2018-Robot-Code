@@ -199,15 +199,15 @@ public class DriveTrain {
 
 		double errorRate = (headingErrorCurrent - errorLast) / timeStep; // integral
 
-		final double PROPORTIONAL_GAIN = 0.007;
-		final double INTEGRAL_GAIN = 0.000007;
+		final double PROPORTIONAL_GAIN = 0.003;
+		final double INTEGRAL_GAIN = 0.0006;
 		final double POSITION_DEADBAND = 2; // degrees
 		final double RATE_DEADBAND = 10; // degrees per second
 
 		leftDrivePower = PROPORTIONAL_GAIN * headingErrorCurrent + INTEGRAL_GAIN * accumulatedError;
 		rightDrivePower = -1 * (PROPORTIONAL_GAIN * headingErrorCurrent + INTEGRAL_GAIN * accumulatedError);
 
-		if (Math.abs(headingErrorCurrent) < POSITION_DEADBAND && Math.abs(errorRate) < RATE_DEADBAND) {
+		if (Math.abs(headingErrorCurrent) < POSITION_DEADBAND ) {
 			status = true;
 			leftDrivePower = 0;
 			rightDrivePower = 0;
@@ -248,11 +248,11 @@ public class DriveTrain {
 
 		double errorRate = (errorCurrent - errorLast) / timeStep; // integral
 
-		final double LINEAR_PROPORTIONAL_GAIN = .075;
-		final double LINEAR_INTEGRAL_GAIN = 0.01;
+		final double LINEAR_PROPORTIONAL_GAIN = .06;
+		final double LINEAR_INTEGRAL_GAIN = 0.007;
 		double ANGLER_PROPORTIONAL_GAIN = .005; // degrees
 		final double ANGLE_DEADBAND = 1; // feet
-		final double LINEAR_DEADBAND = 0.1; // feet
+		final double LINEAR_DEADBAND = 0.3; // feet
 		final double LINEAR_RATE_DEADBAND = .5; // feet per second
 
 		boolean facingTarget = (Math.abs(headingError) < 90);
@@ -289,11 +289,11 @@ public class DriveTrain {
 	public void reverse(boolean isReversing) {
 
 		if (isReversing) {
-			leftDrivePower = -.5;
-			rightDrivePower = -.5;
+			leftDrivePower = .25;
+			rightDrivePower = .25;
 		} else {
-			leftDrivePower = -.5;
-			rightDrivePower = -.5;
+			leftDrivePower = 0;
+			rightDrivePower = 0;
 		}
 		setMotorSpeeds();
 		driveMode = "Driving Back ";
