@@ -19,11 +19,13 @@ public class RoboRioPorts {
 
 	public static final int CAN_ARM_PIVOT = 16;
 
-	public static final int CAN_RAIL_DRIVER1 = 17;
-	public static final int CAN_RAIL_DRIVER2 = 18;
+	public static final int CAN_RAIL_DRIVER_R1 = 17;
+	public static final int CAN_RAIL_DRIVER_R2 = 18;
+	public static final int CAN_RAIL_DRIVER_L1 = 19;
+	public static final int CAN_RAIL_DRIVER_L2 = 20;
 
-	public static final int CAN_CLIMBER1 = 20;
-	public static final int CAN_CLIMBER2 = 21;
+	public static final int CAN_INTAKE_L = 22;
+	public static final int CAN_INTAKE_R = 23;
 
 	// *** PNUEMATICS ***
 	// Example:
@@ -31,9 +33,6 @@ public class RoboRioPorts {
 
 	public static final int DRIVE_DOUBLE_SOLENOID_FWD = 3;
 	public static final int DRIVE_DOUBLE_SOLENOID_REV = 4;
-
-	public static final int GRABBER_PISTON_FWD = 2;
-	public static final int GRABBER_PISTON_REV = 1;
 
 	public static final int CLIMBER_PISTON = 0;
 
@@ -45,5 +44,5 @@ public class RoboRioPorts {
 	public static final int DIO_DRIVE_LEFT_B = 1;
 	public static final int DIO_DRIVE_RIGHT_A = 2;
 	public static final int DIO_DRIVE_RIGHT_B = 3;
-
+	public static final int INTAKE_LIM_SWITCH = 4;
 }

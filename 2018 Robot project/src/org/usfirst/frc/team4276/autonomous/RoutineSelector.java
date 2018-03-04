@@ -54,17 +54,20 @@ public class RoutineSelector extends Thread implements Runnable {
 		// strategyArray[SCORE_SWITCH] = "score switch";
 		// strategyArray[SCORE_SCALE] = "score scale";
 
-		selectionModeChooser = new SendableChooser<Integer>();
-		selectionModeChooser.addDefault(selectionModeArray[COMMIT_MODE], COMMIT_MODE);
-		selectionModeChooser.addObject(selectionModeArray[EDIT_MODE], EDIT_MODE);
-		SmartDashboard.putData("Commit Selections", selectionModeChooser);
-
-		startPosition = new SendableChooser<Integer>();
-		startPosition.addDefault(startPositionArray[CENTER], CENTER);
-		startPosition.addObject(startPositionArray[LEFT], LEFT);
-		startPosition.addObject(startPositionArray[RIGHT], RIGHT);
-		SmartDashboard.putData("Starting Position", startPosition);
-
+		/*
+		 * selectionModeChooser = new SendableChooser<Integer>();
+		 * selectionModeChooser.addDefault(selectionModeArray[COMMIT_MODE],
+		 * COMMIT_MODE);
+		 * selectionModeChooser.addObject(selectionModeArray[EDIT_MODE],
+		 * EDIT_MODE); SmartDashboard.putData("Commit Selections",
+		 * selectionModeChooser);
+		 * 
+		 * startPosition = new SendableChooser<Integer>();
+		 * startPosition.addDefault(startPositionArray[CENTER], CENTER);
+		 * startPosition.addObject(startPositionArray[LEFT], LEFT);
+		 * startPosition.addObject(startPositionArray[RIGHT], RIGHT);
+		 * SmartDashboard.putData("Starting Position", startPosition);
+		 */
 		// strategyChooser = new SendableChooser<Integer>();
 		// strategyChooser.addDefault(startPositionArray[CROSS_BASE],
 		// CROSS_BASE);
@@ -83,14 +86,27 @@ public class RoutineSelector extends Thread implements Runnable {
 	public void run() {
 		try {
 			while (true) {
-				if (selectionMode == COMMIT_MODE) {
-					selectionMode = (int) selectionModeChooser.getSelected();
-				} else {
-					selectionMode = (int) selectionModeChooser.getSelected();
-					startingPosition = (int) startPosition.getSelected();
-					// strategy = (int)
-					// strategyChooser.getSelectedautoModeToExecute =
-					// startingPosition;
+				/*
+				 * if (selectionMode == COMMIT_MODE) { selectionMode = (int)
+				 * selectionModeChooser.getSelected(); } else { selectionMode =
+				 * (int) selectionModeChooser.getSelected(); startingPosition =
+				 * (int) startPosition.getSelected(); // strategy = (int) //
+				 * strategyChooser.getSelectedautoModeToExecute = //
+				 * startingPosition; }
+				 */
+
+				if (Robot.logitechJoystickL.getRawButton(7)) {
+
+					startingPosition = LEFT;
+
+				} else if (Robot.logitechJoystickL.getRawButton(9)) {
+
+					startingPosition = CENTER;
+
+				} else if (Robot.logitechJoystickL.getRawButton(11)) {
+
+					startingPosition = RIGHT;
+
 				}
 
 				SmartDashboard.putString("Selection mode", selectionModeArray[selectionMode]);
@@ -112,4 +128,5 @@ public class RoutineSelector extends Thread implements Runnable {
 		}
 
 	}
+
 }

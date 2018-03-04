@@ -30,12 +30,16 @@ public class AutoMain {
 	static final int ROTATE_OFF_WALL = 2;
 	static final int DRIVE_TO_SCORE_1 = 3;
 	static final int ROTATE_TO_SCORE = 4;
-	static final int RAISE_ELEVATOR = 5;
-	static final int LOWER_ARM = 6;
+	static final int PREP_TO_SCORE = 5;
+	// static final int LOWER_ARM = 6;
 	static final int DRIVE_TO_SCORE_2 = 7;
 	static final int RELEASE_CUBE = 8;
 	static final int BACK_UP = 9;
 	static final int LOWER_ELEVATOR = 10;
+	static final int PREP_TO_COLLECT = 12;
+	static final int ROTATE_TO_COLLECT = 13;
+	static final int DRIVE_TO_COLLECT = 14;
+	static final int SHOOT_CUBE = 15;
 	static final int EXIT = 11;
 
 	static int currentState = INIT; // always runs init first
@@ -51,6 +55,8 @@ public class AutoMain {
 	public final int RIGHT_SWITCH = 4;
 	public final int LEFT_SCALE = 5;
 	public final int RIGHT_SCALE = 6;
+	public final int CROSS_RIGHT_SCALE = 7;
+	public final int CROSS_LEFT_SCALE = 8;
 
 	// command return status
 	boolean coordinateReached = false;
@@ -90,20 +96,36 @@ public class AutoMain {
 	public void updateGameData() {
 		String gameData = DriverStation.getInstance().getGameSpecificMessage();
 
-		if (gameData.charAt(0) == 'L') {
-			switchValue = LEFT_SWITCH;
+		boolean Lswitch = false;
+		boolean Rswitch = false;
+		boolean Lscale = false;
+		boolean Rscale = false;
 
+		if (gameData.charAt(0) == 'L') {
+
+			switchValue = LEFT_SWITCH;
+			Lswitch = true;
 		} else if (gameData.charAt(0) == 'R') {
 
 			switchValue = RIGHT_SWITCH;
+			Rswitch = true;
 		}
 
 		if (gameData.charAt(1) == 'L') {
-			scaleValue = LEFT_SCALE;
 
+			scaleValue = LEFT_SCALE;
+			Lscale = true;
 		} else if (gameData.charAt(1) == 'R') {
+
 			scaleValue = RIGHT_SCALE;
+			Rscale = true;
 		}
+
+		SmartDashboard.putBoolean("L Switch", Lswitch);
+		SmartDashboard.putBoolean("L Switch", Rswitch);
+		SmartDashboard.putBoolean("L Switch", Lscale);
+		SmartDashboard.putBoolean("L Switch", Rscale);
+
 	}
 
 	public void planRoute() {
@@ -129,7 +151,8 @@ public class AutoMain {
 				// if scale on this side
 				setRoutine = LEFT_SCALE;
 			} else {
-				setRoutine = DEFAULT;
+				// if all scoring is on right side
+				setRoutine = CROSS_RIGHT_SCALE;
 			}
 		} else if (startIsRight) {
 			// if start on right side
@@ -141,7 +164,8 @@ public class AutoMain {
 				// if scale on this side
 				setRoutine = RIGHT_SCALE;
 			} else {
-				setRoutine = DEFAULT;
+				// if all scoring is on left side
+				setRoutine = CROSS_LEFT_SCALE;
 			}
 		} else {
 			SmartDashboard.putNumber("Auto Error", ROUTE_PLAN_ERROR);
@@ -156,8 +180,8 @@ public class AutoMain {
 			stateEnabled[ROTATE_OFF_WALL] = false;
 			stateEnabled[DRIVE_TO_SCORE_1] = false;
 			stateEnabled[ROTATE_TO_SCORE] = false;
-			stateEnabled[RAISE_ELEVATOR] = false;
-			stateEnabled[LOWER_ARM] = false;
+			stateEnabled[PREP_TO_SCORE] = false;
+			// stateEnabled[LOWER_ARM] = false;
 			stateEnabled[DRIVE_TO_SCORE_2] = false;
 			stateEnabled[RELEASE_CUBE] = false;
 			stateEnabled[BACK_UP] = false;
@@ -165,12 +189,12 @@ public class AutoMain {
 			stateEnabled[EXIT] = true;
 		} else if (setRoutine == MID_TO_LEFT_SWITCH || setRoutine == MID_TO_RIGHT_SWITCH) {
 			stateEnabled[INIT] = true;
-			stateEnabled[DRIVE_OFF_WALL] = true;
-			stateEnabled[ROTATE_OFF_WALL] = true;
+			stateEnabled[DRIVE_OFF_WALL] = false; // edited
+			stateEnabled[ROTATE_OFF_WALL] = false; // edited
 			stateEnabled[DRIVE_TO_SCORE_1] = true;
-			stateEnabled[ROTATE_TO_SCORE] = true;
-			stateEnabled[RAISE_ELEVATOR] = true;
-			stateEnabled[LOWER_ARM] = true;
+			stateEnabled[ROTATE_TO_SCORE] = false; // edited
+			stateEnabled[PREP_TO_SCORE] = true;
+			// stateEnabled[LOWER_ARM] = true;
 			stateEnabled[DRIVE_TO_SCORE_2] = true;
 			stateEnabled[RELEASE_CUBE] = true;
 			stateEnabled[BACK_UP] = true;
@@ -183,8 +207,8 @@ public class AutoMain {
 			stateEnabled[ROTATE_OFF_WALL] = false;
 			stateEnabled[DRIVE_TO_SCORE_1] = true;
 			stateEnabled[ROTATE_TO_SCORE] = true;
-			stateEnabled[RAISE_ELEVATOR] = true;
-			stateEnabled[LOWER_ARM] = true;
+			stateEnabled[PREP_TO_SCORE] = true;
+			// stateEnabled[LOWER_ARM] = true;
 			stateEnabled[DRIVE_TO_SCORE_2] = true;
 			stateEnabled[RELEASE_CUBE] = true;
 			stateEnabled[BACK_UP] = true;
@@ -197,8 +221,22 @@ public class AutoMain {
 			stateEnabled[ROTATE_OFF_WALL] = false;
 			stateEnabled[DRIVE_TO_SCORE_1] = true;
 			stateEnabled[ROTATE_TO_SCORE] = false;
-			stateEnabled[RAISE_ELEVATOR] = true;
-			stateEnabled[LOWER_ARM] = true;
+			stateEnabled[PREP_TO_SCORE] = true;
+			// stateEnabled[LOWER_ARM] = true;
+			stateEnabled[DRIVE_TO_SCORE_2] = true;
+			stateEnabled[RELEASE_CUBE] = true;
+			stateEnabled[BACK_UP] = true;
+			stateEnabled[LOWER_ELEVATOR] = true;
+			stateEnabled[EXIT] = true;
+		} else if (setRoutine == CROSS_LEFT_SCALE || setRoutine == CROSS_RIGHT_SCALE) {
+			// set all false
+			stateEnabled[INIT] = true;
+			stateEnabled[DRIVE_OFF_WALL] = true;
+			stateEnabled[ROTATE_OFF_WALL] = true;
+			stateEnabled[DRIVE_TO_SCORE_1] = true;
+			stateEnabled[ROTATE_TO_SCORE] = true;
+			stateEnabled[PREP_TO_SCORE] = true;
+			// stateEnabled[LOWER_ARM] = true;
 			stateEnabled[DRIVE_TO_SCORE_2] = true;
 			stateEnabled[RELEASE_CUBE] = true;
 			stateEnabled[BACK_UP] = true;
@@ -224,7 +262,6 @@ public class AutoMain {
 				defineStateEnabledStatus();
 
 				Robot.driveTrain.setHiGear();
-				Robot.manipulator.closeManipulator();
 				phaseTimer.setTimer(0.2);
 				performStateEntry = false;
 
@@ -244,9 +281,9 @@ public class AutoMain {
 		case DRIVE_OFF_WALL:
 			currentStateName = "Drive Off Wall";
 			// State entry
-			
+
 			if (performStateEntry) {
-				
+
 				phaseTimer.setTimer(4);
 				performStateEntry = false;
 			}
@@ -254,6 +291,13 @@ public class AutoMain {
 			// State processing
 			if (setRoutine == DEFAULT) {
 				coordinateReached = Robot.driveTrain.driveToCoordinate(FieldLocations.CROSS_BASE_LINE);
+
+			} else if (setRoutine == CROSS_LEFT_SCALE) {
+				headingReached = Robot.driveTrain.driveToCoordinate(FieldLocations.RIGHT_CROSS_ZONE);
+
+			} else if (setRoutine == CROSS_RIGHT_SCALE) {
+				headingReached = Robot.driveTrain.driveToCoordinate(FieldLocations.LEFT_CROSS_ZONE);
+
 			} else {
 				coordinateReached = Robot.driveTrain.driveToCoordinate(FieldLocations.CENTER_DRIVE_OFF_WALL);
 			}
@@ -278,6 +322,12 @@ public class AutoMain {
 
 			} else if (setRoutine == MID_TO_RIGHT_SWITCH) {
 				headingReached = Robot.driveTrain.rotateToCoordinate(FieldLocations.SWITCH_PREP_RIGHT_A);
+
+			} else if (setRoutine == CROSS_LEFT_SCALE) {
+				headingReached = Robot.driveTrain.rotateToCoordinate(FieldLocations.LEFT_CROSS_ZONE);
+
+			} else if (setRoutine == CROSS_RIGHT_SCALE) {
+				headingReached = Robot.driveTrain.rotateToCoordinate(FieldLocations.RIGHT_CROSS_ZONE);
 
 			} else {
 				SmartDashboard.putNumber("Auto Error", ROUTINE_DETERMINE_ERROR);
@@ -316,6 +366,12 @@ public class AutoMain {
 			} else if (setRoutine == LEFT_SCALE) {
 				coordinateReached = Robot.driveTrain.driveToCoordinate(FieldLocations.SWITCH_PREP_LEFT_B);
 
+			} else if (setRoutine == CROSS_LEFT_SCALE) {
+				headingReached = Robot.driveTrain.driveToCoordinate(FieldLocations.LEFT_CROSS_ZONE);
+
+			} else if (setRoutine == CROSS_RIGHT_SCALE) {
+				headingReached = Robot.driveTrain.driveToCoordinate(FieldLocations.RIGHT_CROSS_ZONE);
+
 			} else {
 				SmartDashboard.putNumber("Auto Error", ROUTINE_DETERMINE_ERROR);
 			}
@@ -346,6 +402,13 @@ public class AutoMain {
 
 			} else if (setRoutine == RIGHT_SWITCH) {
 				coordinateReached = Robot.driveTrain.rotateToCoordinate(FieldLocations.rightSwitchScoringZoneB);
+
+			} else if (setRoutine == CROSS_LEFT_SCALE) {
+				headingReached = Robot.driveTrain.rotateToCoordinate(FieldLocations.leftScaleScoringZoneA);
+
+			} else if (setRoutine == CROSS_RIGHT_SCALE) {
+				headingReached = Robot.driveTrain.rotateToCoordinate(FieldLocations.rightScaleScoringZoneA);
+
 			} else {
 				SmartDashboard.putNumber("Auto Error", ROUTINE_DETERMINE_ERROR);
 			}
@@ -356,8 +419,8 @@ public class AutoMain {
 			}
 			break;
 
-		case RAISE_ELEVATOR:
-			currentStateName = "Raise Elevator";
+		case PREP_TO_SCORE:
+			currentStateName = "score prep";
 
 			// State entry
 			if (performStateEntry) {
@@ -365,12 +428,14 @@ public class AutoMain {
 				performStateEntry = false;
 			}
 			// State processing
+			Robot.armPivoter.commandSetpoint(ARM_OUT);
 			if (setRoutine == MID_TO_LEFT_SWITCH || setRoutine == MID_TO_RIGHT_SWITCH || setRoutine == LEFT_SWITCH
 					|| setRoutine == RIGHT_SWITCH) {
 				// bring elevator to switch scoring height
 				Robot.elevator.commandedHeight = Robot.elevator.SETPOINT_SWITCH;
 
-			} else if (setRoutine == LEFT_SCALE || setRoutine == RIGHT_SCALE) {
+			} else if (setRoutine == LEFT_SCALE || setRoutine == RIGHT_SCALE || setRoutine == CROSS_LEFT_SCALE
+					|| setRoutine == CROSS_RIGHT_SCALE) {
 
 				// bring elevator to scale scoring height
 				Robot.elevator.commandedHeight = Robot.elevator.SETPOINT_SCALE;
@@ -384,22 +449,15 @@ public class AutoMain {
 			}
 			break;
 
-		case LOWER_ARM:
-			currentStateName = "Raise Elevator";
-
-			// State entry
-			if (performStateEntry) {
-				phaseTimer.setTimer(.0001);
-				performStateEntry = false;
-			}
-			// State processing
-
-			Robot.armPivoter.commandSetpoint(ARM_OUT);
-			// State exit
-			if (phaseTimer.isExpired()) {
-				performStateExit();
-			}
-			break;
+		/*
+		 * case LOWER_ARM: currentStateName = "Raise Elevator";
+		 * 
+		 * // State entry if (performStateEntry) { phaseTimer.setTimer(.0001);
+		 * performStateEntry = false; } // State processing
+		 * 
+		 * Robot.armPivoter.commandSetpoint(ARM_OUT); // State exit if
+		 * (phaseTimer.isExpired()) { performStateExit(); } break;
+		 */
 
 		case DRIVE_TO_SCORE_2:
 			currentStateName = "Drive to Score Deliver";
@@ -428,6 +486,12 @@ public class AutoMain {
 			} else if (setRoutine == LEFT_SCALE) {
 				coordinateReached = Robot.driveTrain.driveToCoordinate(FieldLocations.leftScaleScoringZoneA);
 
+			} else if (setRoutine == CROSS_LEFT_SCALE) {
+				headingReached = Robot.driveTrain.driveToCoordinate(FieldLocations.leftScaleScoringZoneA);
+
+			} else if (setRoutine == CROSS_RIGHT_SCALE) {
+				headingReached = Robot.driveTrain.driveToCoordinate(FieldLocations.rightScaleScoringZoneA);
+
 			} else {
 				SmartDashboard.putNumber("Auto Error", ROUTINE_DETERMINE_ERROR);
 			}
@@ -443,7 +507,7 @@ public class AutoMain {
 			// State entry
 			if (performStateEntry) {
 
-				Robot.manipulator.openManipulator();
+				Robot.manipulator.outake();
 				phaseTimer.setTimer(0.3);
 				performStateEntry = false;
 			}
@@ -493,6 +557,94 @@ public class AutoMain {
 			}
 			break;
 
+		case PREP_TO_COLLECT:
+			currentStateName = "Run Collector";
+			if (performStateEntry) {
+				phaseTimer.setTimer(.0001);
+				performStateEntry = false;
+			}
+			// State processing
+			Robot.armPivoter.commandSetpoint(0);
+			Robot.elevator.commandedHeight = Robot.elevator.SETPOINT_BOTTOM;
+			// State exit
+			if (phaseTimer.isExpired()) {
+				performStateExit();
+			}
+
+			break;
+
+		case ROTATE_TO_COLLECT:
+			currentStateName = "Rotate to collect";
+
+			// State entry
+			if (performStateEntry) {
+				phaseTimer.setTimer(1.5);
+				performStateEntry = false;
+			}
+			// State processing
+			if (setRoutine == CROSS_LEFT_SCALE) {
+				coordinateReached = Robot.driveTrain.rotateToCoordinate(FieldLocations.leftCornerCubeLocation);
+
+			} else if (setRoutine == CROSS_RIGHT_SCALE) {
+				coordinateReached = Robot.driveTrain.rotateToCoordinate(FieldLocations.rightCornerCubeLocation);
+
+			} else {
+				SmartDashboard.putNumber("Auto Error", ROUTINE_DETERMINE_ERROR);
+			}
+			// State exit
+			if (coordinateReached || phaseTimer.isExpired()) {
+				Robot.driveTrain.resetDrive();
+				performStateExit();
+			}
+			break;
+
+		case DRIVE_TO_COLLECT:
+			currentStateName = "Drive to collect";
+
+			// State entry
+			if (performStateEntry) {
+				phaseTimer.setTimer(1.5);
+				performStateEntry = false;
+			}
+			// State processing
+
+			coordinateReached = Robot.manipulator.collect();
+
+			if (setRoutine == CROSS_LEFT_SCALE) {
+				Robot.driveTrain.driveToCoordinate(FieldLocations.leftCornerCubeLocation);
+
+			} else if (setRoutine == CROSS_RIGHT_SCALE) {
+				Robot.driveTrain.driveToCoordinate(FieldLocations.rightCornerCubeLocation);
+
+			} else {
+				SmartDashboard.putNumber("Auto Error", ROUTINE_DETERMINE_ERROR);
+			}
+			// State exit
+			if (coordinateReached || phaseTimer.isExpired()) {
+				Robot.driveTrain.resetDrive();
+				performStateExit();
+			}
+			break;
+
+		case SHOOT_CUBE:
+			currentStateName = "Release Cube";
+			// State entry
+			if (performStateEntry) {
+
+				Robot.manipulator.shoot();
+				phaseTimer.setTimer(0.3);
+				performStateEntry = false;
+			}
+
+			// State processing
+
+			// State exit
+			if (phaseTimer.isExpired()) {
+				performStateExit();
+			}
+
+			break;
+
 		case EXIT:
 			Robot.driveTrain.resetDrive();
 			currentStateName = "Autonomous Done";
@@ -503,6 +655,12 @@ public class AutoMain {
 	}
 
 	private void performStateExit() {
+		if (phaseTimer.isExpired()) {
+			SmartDashboard.putString("Exit Status", currentStateName + "time expired");
+		} else {
+			SmartDashboard.putString("Exit Status", currentStateName + "target reached");
+		}
+
 		performStateEntry = true;
 		advanceState();
 	}

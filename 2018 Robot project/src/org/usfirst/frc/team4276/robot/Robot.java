@@ -23,7 +23,6 @@ public class Robot extends SampleRobot {
 
 	public static Cameras robotCameraSystem;
 	public static DriveTrain driveTrain;
-	public static Climber climber;
 	public static Elevator elevator;
 	public static Manipulator manipulator;
 	public static ArmPivoter armPivoter;
@@ -46,10 +45,11 @@ public class Robot extends SampleRobot {
 		driveTrain = new DriveTrain(RoboRioPorts.DRIVE_DOUBLE_SOLENOID_FWD, RoboRioPorts.DRIVE_DOUBLE_SOLENOID_REV,
 				RoboRioPorts.CAN_DRIVE_L1, RoboRioPorts.CAN_DRIVE_R1, RoboRioPorts.CAN_DRIVE_L2,
 				RoboRioPorts.CAN_DRIVE_R2, RoboRioPorts.CAN_DRIVE_L3, RoboRioPorts.CAN_DRIVE_R3);
-		climber = new Climber(RoboRioPorts.CAN_CLIMBER1, RoboRioPorts.CAN_CLIMBER2, RoboRioPorts.CLIMBER_PISTON);
-		elevator = new Elevator(RoboRioPorts.CAN_RAIL_DRIVER1, RoboRioPorts.CAN_RAIL_DRIVER2);
+		elevator = new Elevator(RoboRioPorts.CAN_RAIL_DRIVER_R1, RoboRioPorts.CAN_RAIL_DRIVER_R2,
+				RoboRioPorts.CAN_RAIL_DRIVER_L1, RoboRioPorts.CAN_RAIL_DRIVER_L2);
 		armPivoter = new ArmPivoter(RoboRioPorts.CAN_ARM_PIVOT);
-		manipulator = new Manipulator(RoboRioPorts.GRABBER_PISTON_FWD, RoboRioPorts.GRABBER_PISTON_REV);
+		manipulator = new Manipulator(RoboRioPorts.CAN_INTAKE_L, RoboRioPorts.CAN_INTAKE_R,
+				RoboRioPorts.INTAKE_LIM_SWITCH);
 
 		// Autonomous
 		routineSelector = new RoutineSelector();
@@ -91,7 +91,6 @@ public class Robot extends SampleRobot {
 
 		while (isOperatorControl() && isEnabled()) {
 			driveTrain.performMainProcessing();
-			// robotClimber.performMainProcessing();
 			// robotArmPivoter.performMainProcessing();
 			manipulator.performMainProcessing();
 			Timer.delay(0.05);

@@ -159,7 +159,11 @@ public class DriveTrain {
 		leftDrivePower = PROPORTIONAL_GAIN * headingErrorCurrent + INTEGRAL_GAIN * accumulatedError;
 		rightDrivePower = -1 * (PROPORTIONAL_GAIN * headingErrorCurrent + INTEGRAL_GAIN * accumulatedError);
 
-		if (Math.abs(headingErrorCurrent) < POSITION_DEADBAND /* && Math.abs(errorRate) < RATE_DEADBAND */) {
+		if (Math.abs(headingErrorCurrent) < POSITION_DEADBAND /*
+																 * && Math.abs(
+																 * errorRate) <
+																 * RATE_DEADBAND
+																 */) {
 			status = true;
 			leftDrivePower = 0;
 			rightDrivePower = 0;
@@ -207,7 +211,7 @@ public class DriveTrain {
 		leftDrivePower = PROPORTIONAL_GAIN * headingErrorCurrent + INTEGRAL_GAIN * accumulatedError;
 		rightDrivePower = -1 * (PROPORTIONAL_GAIN * headingErrorCurrent + INTEGRAL_GAIN * accumulatedError);
 
-		if (Math.abs(headingErrorCurrent) < POSITION_DEADBAND ) {
+		if (Math.abs(headingErrorCurrent) < POSITION_DEADBAND) {
 			status = true;
 			leftDrivePower = 0;
 			rightDrivePower = 0;
@@ -248,7 +252,8 @@ public class DriveTrain {
 
 		double errorRate = (errorCurrent - errorLast) / timeStep; // integral
 
-		final double LINEAR_PROPORTIONAL_GAIN = .06;
+		final double MAX_POWER = 0.7;
+		final double LINEAR_PROPORTIONAL_GAIN = .08;
 		final double LINEAR_INTEGRAL_GAIN = 0.007;
 		double ANGLER_PROPORTIONAL_GAIN = .005; // degrees
 		final double ANGLE_DEADBAND = 1; // feet
@@ -281,6 +286,13 @@ public class DriveTrain {
 			leftDrivePower = 0;
 			rightDrivePower = 0;
 		}
+
+		if (leftDrivePower > MAX_POWER)
+			leftDrivePower = MAX_POWER;
+
+		if (rightDrivePower > MAX_POWER)
+			rightDrivePower = MAX_POWER;
+
 		setMotorSpeeds();
 		driveMode = "Driving to: " + desiredCoordinate[0] + "," + desiredCoordinate[1];
 		return status;

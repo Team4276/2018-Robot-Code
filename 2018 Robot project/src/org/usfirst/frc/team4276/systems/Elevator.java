@@ -11,8 +11,10 @@ import org.usfirst.frc.team4276.utilities.Toggler;
 
 public class Elevator extends Thread implements Runnable {
 
-	private TalonSRX elevatorDriverMain;
-	private VictorSPX elevatorDriverFollow;
+	private TalonSRX elevatorDriverMainR1;
+	private VictorSPX elevatorDriverR2;
+	private VictorSPX elevatorDriverL1;
+	private VictorSPX elevatorDriverL2;
 	private Toggler manualOverrideToggler;
 
 	// Constants - Lower Rail
@@ -63,14 +65,16 @@ public class Elevator extends Thread implements Runnable {
 	private double timePrevious;
 	private double timeStep;
 
-	public Elevator(int elevator1CANPort, int elevator2CANPort) {
-		elevatorDriverMain = new TalonSRX(elevator1CANPort);
-		elevatorDriverFollow = new VictorSPX(elevator2CANPort);
+	public Elevator(int elevator1CANPort, int elevator2CANPort, int elevator3CANPort, int elevator4CANPort) {
+		elevatorDriverMainR1 = new TalonSRX(elevator1CANPort);
+		elevatorDriverR2 = new VictorSPX(elevator2CANPort);
+		elevatorDriverL1 = new VictorSPX(elevator3CANPort);
+		elevatorDriverL2 = new VictorSPX(elevator4CANPort);
 		manualOverrideToggler = new Toggler(Xbox.Back);
 
 		// elevatorDriverFollow.set(ControlMode.Follower, elevator1CANPort);
 		encoderOffset = STARTING_HEIGHT
-				- elevatorDriverMain.getSensorCollection().getQuadraturePosition() * HEIGHT_PER_PULSE;
+				- elevatorDriverMainR1.getSensorCollection().getQuadraturePosition() * HEIGHT_PER_PULSE;
 	}
 
 	private void computeManualPowerOffset() {
@@ -123,7 +127,7 @@ public class Elevator extends Thread implements Runnable {
 	private void computeActivePower() {
 		if (initializePID == true) {
 			timeNow = Robot.systemTimer.get();
-			estimatedHeight = elevatorDriverMain.getSensorCollection().getQuadraturePosition() * HEIGHT_PER_PULSE
+			estimatedHeight = elevatorDriverMainR1.getSensorCollection().getQuadraturePosition() * HEIGHT_PER_PULSE
 					+ encoderOffset;
 			heightError = commandedHeight - estimatedHeight;
 			accumulatedError = 0.0;
@@ -132,14 +136,14 @@ public class Elevator extends Thread implements Runnable {
 			heightErrorLast = heightError;
 			timePrevious = timeNow;
 			timeNow = Robot.systemTimer.get();
-			estimatedHeight = elevatorDriverMain.getSensorCollection().getQuadraturePosition() * HEIGHT_PER_PULSE
+			estimatedHeight = elevatorDriverMainR1.getSensorCollection().getQuadraturePosition() * HEIGHT_PER_PULSE
 					+ encoderOffset;
 			timeStep = timeNow - timePrevious;
 
 			// Compute control errors
 			heightError = commandedHeight - estimatedHeight; // height
 			accumulatedError = accumulatedError + (heightErrorLast + heightError) / 2 * timeStep; // height*sec
-			rateError = -elevatorDriverMain.getSensorCollection().getQuadratureVelocity() * 10 * HEIGHT_PER_PULSE; // height/sec
+			rateError = -elevatorDriverMainR1.getSensorCollection().getQuadratureVelocity() * 10 * HEIGHT_PER_PULSE; // height/sec
 
 			// For large height errors, follow coast speed until close to target
 			if (heightError > HEIGHT_THRESHOLD) {
@@ -158,8 +162,8 @@ public class Elevator extends Thread implements Runnable {
 			}
 
 			// Engage manual override if CAN bus is lost
-			if (elevatorDriverMain.getSensorCollection().getQuadraturePosition() == 0
-					&& elevatorDriverMain.getSensorCollection().getQuadratureVelocity() == 0) {
+			if (elevatorDriverMainR1.getSensorCollection().getQuadraturePosition() == 0
+					&& elevatorDriverMainR1.getSensorCollection().getQuadratureVelocity() == 0) {
 				manualOverrideToggler.setMechanismState(true);
 				activePower = 0;
 			}
@@ -238,8 +242,8 @@ public class Elevator extends Thread implements Runnable {
 	}
 
 	private void updateTelemetry() {
-		SmartDashboard.putNumber("current draw elevator 1", elevatorDriverMain.getOutputCurrent());
-		SmartDashboard.putNumber("current draw elevator 2", elevatorDriverFollow.getOutputCurrent());
+		SmartDashboard.putNumber("current draw elevator 1", elevatorDriverMainR1.getOutputCurrent());
+		SmartDashboard.putNumber("current draw elevator 2", elevatorDriverR2.getOutputCurrent());
 		SmartDashboard.putNumber("Commanded arm height", commandedHeight);
 		SmartDashboard.putNumber("Estimated arm height", estimatedHeight);
 		SmartDashboard.putBoolean("Elevator override", manualOverrideIsEngaged);
@@ -281,8 +285,12 @@ public class Elevator extends Thread implements Runnable {
 				commandedPower = staticPower + activePower;
 			}
 			limitCommandedPower();
-			elevatorDriverMain.set(ControlMode.PercentOutput, commandedPower);
-			elevatorDriverFollow.set(ControlMode.PercentOutput, commandedPower);
+			elevatorDriverMainR1.set(ControlMode.PercentOutput, commandedPower);
+			elevatorDriverR2.set(ControlMode.PercentOutput, commandedPower);
+			// negative because facing opposite direction
+			// TODO test all motor directions
+			elevatorDriverL1.set(ControlMode.PercentOutput, -commandedPower);
+			elevatorDriverL2.set(ControlMode.PercentOutput, -commandedPower);
 			updateTelemetry();
 			Timer.delay(0.125);
 		}
