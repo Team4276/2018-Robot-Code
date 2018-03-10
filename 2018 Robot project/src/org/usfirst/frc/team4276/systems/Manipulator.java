@@ -7,17 +7,12 @@ import org.usfirst.frc.team4276.utilities.Xbox;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class Manipulator {
 	final double TRIGGER_THRESHOLD = 0.5;
 	final double AUTO_GRAB_DELAY = 0.2;
-	final Value CLOSED = DoubleSolenoid.Value.kReverse;
-	final Value OPEN = DoubleSolenoid.Value.kForward;
 
 	VictorSPX intakeMotorLeft;
 	VictorSPX intakeMotorRight;
@@ -25,8 +20,6 @@ public class Manipulator {
 	DigitalInput limitSwitch;
 
 	boolean autoGrabInit = true;
-	Value manipulatorValue;
-	boolean manipulatorIsOpen;
 	final double INTAKE_SPEED = 1;
 	final double OUTAKE_SPEED = -0.3;
 	final double SHOOT_SPEED = -1;
@@ -78,33 +71,7 @@ public class Manipulator {
 		}
 	}
 
-	/*
-	 * public void openManipulator() { solenoid.set(OPEN); }
-	 * 
-	 * public void closeManipulator() { solenoid.set(CLOSED); }
-	 */
 	public void performMainProcessing() {
-		// get desired manipulator position based on right trigger toggler
-		/*
-		 * rtToggler.updateMechanismState(TRIGGER_THRESHOLD);
-		 * manipulatorCommandedOpen = rtToggler.getMechanismState();
-		 * 
-		 * manipulatorValue = solenoid.get(); manipulatorIsOpen =
-		 * (manipulatorValue == OPEN);
-		 * 
-		 * // if pressing left trigger and autoGrab should be initialized if
-		 * (Robot.xboxController.getRawAxis(Xbox.LT) > TRIGGER_THRESHOLD &&
-		 * autoGrabInit) { // set timer, grab cube, and end init
-		 * solenoid.set(CLOSED); armTimer.setTimer(AUTO_GRAB_DELAY);
-		 * autoGrabInit = false; } // if time is up and already initialized else
-		 * if (armTimer.isExpired() && !autoGrabInit) { // sets arm and elevator
-		 * setpoints and sets for reinitialization
-		 * Robot.armPivoter.commandSetpoint(80); Robot.elevator.commandedHeight
-		 * = Robot.elevator.SETPOINT_PREP; autoGrabInit = true; } // open or
-		 * close solenoid depending on desired manipulator position else if
-		 * (manipulatorCommandedOpen) { solenoid.set(OPEN); } else {
-		 * solenoid.set(CLOSED); }
-		 */
 
 		if (Robot.xboxController.getRawButton(Xbox.LB)) {
 			intake();

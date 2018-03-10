@@ -2,48 +2,42 @@ package org.usfirst.frc.team4276.systems;
 
 import org.usfirst.frc.team4276.robot.Robot;
 import org.usfirst.frc.team4276.utilities.Xbox;
+import org.usfirst.frc.team4276.utilities.Toggler;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-
-import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Climber {
-	Solenoid releaseTrigger;
-	VictorSPX climberMotor1, climberMotor2;
-	final double MOTOR_POWER = 1;
-	boolean climbInProgress = false;
+	DoubleSolenoid lockingPin;
+	Toggler lockingToggler;
+	DoubleSolenoid.Value ENGAGED = Value.kForward;
+	DoubleSolenoid.Value DISENGAGED = Value.kReverse;
+	boolean climberIsLocked = false;
+	final double LT_THRESHOLD = 0.5;
 
-	public Climber(int canPort1, int canPort2, int PnuematicPort) {
-		climberMotor1 = new VictorSPX(canPort1);
-		climberMotor2 = new VictorSPX(canPort2);
-		releaseTrigger = new Solenoid(PnuematicPort);
+	public Climber(int PnuematicPort1, int PnuematicPort2) {
+		lockingPin = new DoubleSolenoid(PnuematicPort1, PnuematicPort2);
+		lockingToggler = new Toggler(Xbox.LT);
 	}
 
 	public void performMainProcessing() {
-		checkForNuclearKeyTurn();
-		if (Robot.xboxController.getPOV(Xbox.DPad) == Xbox.POVup) {
-			climberMotor1.set(ControlMode.PercentOutput, MOTOR_POWER);
-			climberMotor2.set(ControlMode.PercentOutput, MOTOR_POWER);
+		lockingToggler.updateMechanismState(LT_THRESHOLD);
+		boolean togglerState = lockingToggler.getMechanismState();
+		if (togglerState) {
 			// when climber is on climbInProgress = true (bookkept)
-			climbInProgress = true;
+			lockingPin.set(ENGAGED);
+			climberIsLocked = true;
 
 		} else {
-			climberMotor1.set(ControlMode.PercentOutput, 0);
-			climberMotor2.set(ControlMode.PercentOutput, 0);
 			// when climber is off climbInProgress = false (bookkept)
-			climbInProgress = false;
+			lockingPin.set(DISENGAGED);
+			climberIsLocked = false;
 		}
-	}
-
-	public void checkForNuclearKeyTurn() {
-		if (Robot.logitechJoystickR.getRawButton(1) && Robot.xboxController.getRawAxis(Xbox.LT) > .05) {
-			releaseTrigger.set(true);
-		}
+		updateTelemetry();
 	}
 
 	public void updateTelemetry() {
-		SmartDashboard.putBoolean("climb in progress", climbInProgress);
+		SmartDashboard.putBoolean("Climber Locked", climberIsLocked);
 	}
 }

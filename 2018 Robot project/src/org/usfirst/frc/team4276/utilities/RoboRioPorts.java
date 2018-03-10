@@ -34,7 +34,8 @@ public class RoboRioPorts {
 	public static final int DRIVE_DOUBLE_SOLENOID_FWD = 3;
 	public static final int DRIVE_DOUBLE_SOLENOID_REV = 4;
 
-	public static final int CLIMBER_PISTON = 0;
+	public static final int CLIMBER_PISTON_FWD = 0;
+	public static final int CLIMBER_PISTON_REV = 1;
 
 	// *** DIO ***
 	// Example:

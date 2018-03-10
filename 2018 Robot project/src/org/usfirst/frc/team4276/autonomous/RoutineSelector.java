@@ -10,10 +10,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 public class RoutineSelector extends Thread implements Runnable {
 
-	SendableChooser<Integer> selectionModeChooser;
-	SendableChooser<Integer> startPosition;
-	SendableChooser<Integer> strategyChooser;
-
 	// Selection modes
 	private final int COMMIT_MODE = 0;
 	private final int EDIT_MODE = 1;
@@ -26,14 +22,10 @@ public class RoutineSelector extends Thread implements Runnable {
 	static String[] startPositionArray = new String[3];
 
 	// Starting positions
-	// private final int CROSS_BASE = 0;
-	// private final int SCORE_SWITCH = 1;
-	// private final int SCORE_SCALE = 2;
-	// private String[] strategyArray = new String[3];
-
-	private final int LEFT_PLATFORM = 0;
-	private final int RIGHT_PLATFORM = 1;
-	private String[] scoringPlatformArray = new String[3];
+	public final int CROSS_BASE = 0;
+	public final int SCORE_SWITCH = 1;
+	public final int SCORE_BOTH = 2;
+	private String[] strategyArray = new String[3];
 
 	private int selectionMode = COMMIT_MODE;
 	static int startingPosition = 0;
@@ -50,9 +42,9 @@ public class RoutineSelector extends Thread implements Runnable {
 		startPositionArray[CENTER] = "center";
 		startPositionArray[RIGHT] = "right";
 
-		// strategyArray[CROSS_BASE] = "cross base";
-		// strategyArray[SCORE_SWITCH] = "score switch";
-		// strategyArray[SCORE_SCALE] = "score scale";
+		strategyArray[CROSS_BASE] = "cross base";
+		strategyArray[SCORE_SWITCH] = "score switch";
+		strategyArray[SCORE_BOTH] = "score both";
 
 		/*
 		 * selectionModeChooser = new SendableChooser<Integer>();
@@ -109,10 +101,19 @@ public class RoutineSelector extends Thread implements Runnable {
 
 				}
 
+				if (Robot.logitechJoystickL.getRawButton(8)) {
+
+					strategy = SCORE_SWITCH;
+
+				} else if (Robot.logitechJoystickL.getRawButton(10)) {
+
+					strategy = SCORE_BOTH;
+
+				}
+
 				SmartDashboard.putString("Selection mode", selectionModeArray[selectionMode]);
 				SmartDashboard.putString("Starting Position", startPositionArray[startingPosition]);
-				// SmartDashboard.putString("Auto mode",
-				// strategyArray[strategy]);
+				SmartDashboard.putString("Auto mode", strategyArray[strategy]);
 
 				Timer.delay(0.1);
 				SmartDashboard.putBoolean("AutoSelector Error", false);

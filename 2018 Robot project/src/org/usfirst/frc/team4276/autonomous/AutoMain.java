@@ -53,10 +53,18 @@ public class AutoMain {
 	public final int MID_TO_RIGHT_SWITCH = 2;
 	public final int LEFT_SWITCH = 3;
 	public final int RIGHT_SWITCH = 4;
-	public final int LEFT_SCALE = 5;
-	public final int RIGHT_SCALE = 6;
-	public final int CROSS_RIGHT_SCALE = 7;
-	public final int CROSS_LEFT_SCALE = 8;
+	public final int LEFT_SCALE = 3;
+	public final int RIGHT_SCALE = 4;
+	public final int LEFT_SWITCH_AND_SCALE = 5;
+	public final int RIGHT_SWITCH_AND_SCALE = 6;
+	public final int LEFT_SWITCH_RIGHT_SCALE = 7;
+	public final int RIGHT_SWITCH_LEFT_SCALE = 8;
+	public final int RIGHT_SCALE_LEFT_SWITCH = 9;
+	public final int LEFT_SCALE_RIGHT_SWITCH = 10;
+	public final int CROSS_RIGHT_SWITCH = 11;
+	public final int CROSS_LEFT_SWITCH = 12;
+	public final int CROSS_RIGHT_SWITCH_SCALE = 13;
+	public final int CROSS_LEFT_SWITCH_SCALE = 14;
 
 	// command return status
 	boolean coordinateReached = false;
@@ -141,34 +149,77 @@ public class AutoMain {
 				// if switch to right
 				setRoutine = MID_TO_RIGHT_SWITCH;
 			}
-		} else if (startIsLeft) {
-			// if start on left side
+		} else if (Robot.routineSelector.strategy == Robot.routineSelector.SCORE_SWITCH) {
+			// if set to just switch
+			if (startIsLeft) {
+				// if start on left side
+				if (switchValue == LEFT_SWITCH) {
+					// if switch on this side
+					setRoutine = LEFT_SWITCH;
+				} else if (switchValue == RIGHT_SWITCH) {
+					// if switch on other side
+					setRoutine = CROSS_RIGHT_SWITCH;
+				} else {
+					// if all scoring is on right side
+					SmartDashboard.putNumber("Auto Error", ROUTE_PLAN_ERROR);
+				}
+			} else if (startIsRight) {
+				// if start on right side
 
-			if (switchValue == LEFT_SWITCH) {
-				// if switch on this side
-				setRoutine = LEFT_SWITCH;
-			} else if (scaleValue == LEFT_SCALE) {
-				// if scale on this side
-				setRoutine = LEFT_SCALE;
+				if (switchValue == RIGHT_SWITCH) {
+					// if switch on this side
+					setRoutine = RIGHT_SWITCH;
+				} else if (scaleValue == LEFT_SWITCH) {
+					// if scale on this side
+					setRoutine = CROSS_LEFT_SWITCH;
+				} else {
+					// if all scoring is on left side
+					SmartDashboard.putNumber("Auto Error", ROUTE_PLAN_ERROR);
+				}
 			} else {
-				// if all scoring is on right side
-				setRoutine = CROSS_RIGHT_SCALE;
+				SmartDashboard.putNumber("Auto Error", ROUTE_PLAN_ERROR);
 			}
-		} else if (startIsRight) {
-			// if start on right side
-
-			if (switchValue == RIGHT_SWITCH) {
-				// if switch on this side
-				setRoutine = RIGHT_SWITCH;
-			} else if (scaleValue == RIGHT_SCALE) {
-				// if scale on this side
-				setRoutine = RIGHT_SCALE;
+		} else if (Robot.routineSelector.strategy == Robot.routineSelector.SCORE_BOTH) {
+			// if set to score both
+			if (startIsLeft) {
+				// if start on left side
+				if (switchValue == LEFT_SWITCH && scaleValue == LEFT_SCALE) {
+					// if switch and scale on this side
+					setRoutine = LEFT_SWITCH_AND_SCALE;
+				} else if (switchValue == LEFT_SWITCH && scaleValue == RIGHT_SCALE) {
+					// if switch on this side scale on other side
+					setRoutine = LEFT_SWITCH_RIGHT_SCALE;
+				} else if (switchValue == RIGHT_SWITCH && scaleValue == LEFT_SCALE) {
+					// if switch on other side scale on this side
+					setRoutine = LEFT_SCALE_RIGHT_SWITCH;
+				} else if (switchValue == RIGHT_SWITCH && scaleValue == RIGHT_SCALE) {
+					// if switch on other side scale on other side
+					setRoutine = CROSS_RIGHT_SWITCH_SCALE;
+				} else {
+					// if all scoring is on right side
+					SmartDashboard.putNumber("Auto Error", ROUTE_PLAN_ERROR);
+				}
+			} else if (startIsRight) {
+				// if start on right side
+				if (switchValue == RIGHT_SWITCH && scaleValue == RIGHT_SCALE) {
+					// if switch and scale on this side
+					setRoutine = RIGHT_SWITCH_AND_SCALE;
+				} else if (switchValue == RIGHT_SWITCH && scaleValue == LEFT_SCALE) {
+					// if switch on this side scale on other side
+					setRoutine = RIGHT_SWITCH_LEFT_SCALE;
+				} else if (switchValue == LEFT_SWITCH && scaleValue == RIGHT_SCALE) {
+					// if switch on other side scale on this side
+					setRoutine = RIGHT_SCALE_LEFT_SWITCH;
+				} else if (switchValue == LEFT_SWITCH && scaleValue == LEFT_SCALE) {
+					// if switch on other side scale on other side
+					setRoutine = CROSS_LEFT_SWITCH_SCALE;
+				} else {
+					// if all scoring is on right side
+					SmartDashboard.putNumber("Auto Error", ROUTE_PLAN_ERROR);
+				}
 			} else {
-				// if all scoring is on left side
-				setRoutine = CROSS_LEFT_SCALE;
+				SmartDashboard.putNumber("Auto Error", ROUTE_PLAN_ERROR);
 			}
-		} else {
-			SmartDashboard.putNumber("Auto Error", ROUTE_PLAN_ERROR);
 		}
 	}
 

@@ -26,6 +26,7 @@ public class Robot extends SampleRobot {
 	public static Elevator elevator;
 	public static Manipulator manipulator;
 	public static ArmPivoter armPivoter;
+	public static Climber climber;
 
 	public static PositionFinder positionFinder;
 	public static RoutineSelector routineSelector;
@@ -50,6 +51,7 @@ public class Robot extends SampleRobot {
 		armPivoter = new ArmPivoter(RoboRioPorts.CAN_ARM_PIVOT);
 		manipulator = new Manipulator(RoboRioPorts.CAN_INTAKE_L, RoboRioPorts.CAN_INTAKE_R,
 				RoboRioPorts.INTAKE_LIM_SWITCH);
+		climber = new Climber(RoboRioPorts.CLIMBER_PISTON_FWD, RoboRioPorts.CLIMBER_PISTON_REV);
 
 		// Autonomous
 		routineSelector = new RoutineSelector();
@@ -92,6 +94,7 @@ public class Robot extends SampleRobot {
 		while (isOperatorControl() && isEnabled()) {
 			driveTrain.performMainProcessing();
 			// robotArmPivoter.performMainProcessing();
+			climber.performMainProcessing();
 			manipulator.performMainProcessing();
 			Timer.delay(0.05);
 		}
