@@ -30,10 +30,12 @@ public class FieldLocations {
 	public static final double[] rightScaleScoringZoneB = new double[] { 27, 5.3 };
 	public static final double[] leftSwitchScoringZoneB = new double[] { 13.9, 20.6 };
 	public static final double[] rightSwitchScoringZoneB = new double[] { 13.9, 6.4 };
+	public static final double[] SWITCH_SCORING_ZONE_LEFT_C = new double[] { 17, 18 };
+	public static final double[] SWITCH_SCORING_ZONE_RIGHT_C = new double[] { 17, 9 };
 	public static final double[] LEFT_CROSS_ZONE = new double[] { 20, 21 };
 	public static final double[] RIGHT_CROSS_ZONE = new double[] { 20, 6 };
-	public static final double[] LEFT_JUNCTION = new double[] { 20, 19 };
-	public static final double[] RIGHT_JUNCTION = new double[] { 20, 8 };
+	public static final double[] LEFT_JUNCTION = new double[] { 20, 18 };
+	public static final double[] RIGHT_JUNCTION = new double[] { 20, 9 };
 
 	public static final int LEFT = 0;
 	public static final int RIGHT = 1;

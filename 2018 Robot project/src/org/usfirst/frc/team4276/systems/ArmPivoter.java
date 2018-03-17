@@ -14,7 +14,7 @@ import org.usfirst.frc.team4276.utilities.Toggler;
 public class ArmPivoter extends Thread implements Runnable {
 
 	private TalonSRX pivoter;
-	private Toggler manualOverrideToggler;
+	private Toggler manualOverrideTogglerPivot;
 	private SoftwareTimer armTimer;
 
 	// Constants
@@ -54,7 +54,7 @@ public class ArmPivoter extends Thread implements Runnable {
 
 	public ArmPivoter(int pivoterCANPort) {
 		pivoter = new TalonSRX(pivoterCANPort);
-		manualOverrideToggler = new Toggler(Xbox.Start);
+		manualOverrideTogglerPivot = new Toggler(Xbox.Start);
 		armTimer = new SoftwareTimer();
 		encoderOffset = STARTING_ANGLE - pivoter.getSensorCollection().getQuadraturePosition() * DEGREES_PER_PULSE;
 	}
@@ -112,11 +112,13 @@ public class ArmPivoter extends Thread implements Runnable {
 					+ DERIVATIVE_GAIN * rateError;
 			
 			// Engage manual override if CAN bus is lost
+			/*
 			if (pivoter.getSensorCollection().getQuadraturePosition() == 0
 					&& pivoter.getSensorCollection().getQuadratureVelocity() == 0) {
-				manualOverrideToggler.setMechanismState(true);
+				manualOverrideTogglerPivot.setMechanismState(true);
 				activePower = 0;
 			}
+			*/
 		}
 	}
 
@@ -210,8 +212,8 @@ public class ArmPivoter extends Thread implements Runnable {
 		while (true) {
 			// tuneControlGains(); // for gain tuning only - COMMENT THIS LINE OUT FOR
 			// COMPETITION
-			manualOverrideToggler.updateMechanismState();
-			manualOverrideIsEngaged = manualOverrideToggler.getMechanismState();
+			manualOverrideTogglerPivot.updateMechanismState();
+			manualOverrideIsEngaged = manualOverrideTogglerPivot.getMechanismState();
 			if (manualOverrideIsEngaged) {
 				computeManualPowerOffset();
 				commandedPower = commandedPower + manualPower;
