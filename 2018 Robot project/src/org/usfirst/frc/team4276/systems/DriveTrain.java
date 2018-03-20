@@ -298,11 +298,24 @@ public class DriveTrain {
 		return status;
 	}
 
-	public void reverse(boolean isReversing) {
+	public void goReverse(boolean isReversing) {
 
 		if (isReversing) {
 			leftDrivePower = .25;
 			rightDrivePower = .25;
+		} else {
+			leftDrivePower = 0;
+			rightDrivePower = 0;
+		}
+		setMotorSpeeds();
+		driveMode = "Driving Back ";
+	}
+
+	public void goForward(boolean isForward) {
+
+		if (isForward) {
+			leftDrivePower = -.25;
+			rightDrivePower = -.25;
 		} else {
 			leftDrivePower = 0;
 			rightDrivePower = 0;

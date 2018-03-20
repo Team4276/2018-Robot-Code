@@ -38,19 +38,19 @@ public class Manipulator {
 
 	public void intake() {
 		intakeMotorLeft.set(ControlMode.PercentOutput, INTAKE_SPEED);
-		intakeMotorRight.set(ControlMode.PercentOutput, INTAKE_SPEED);
+		intakeMotorRight.set(ControlMode.PercentOutput,-INTAKE_SPEED);
 		intakeMode = IN;
 	}
 
 	public void outake() {
 		intakeMotorLeft.set(ControlMode.PercentOutput, OUTAKE_SPEED);
-		intakeMotorRight.set(ControlMode.PercentOutput, OUTAKE_SPEED);
+		intakeMotorRight.set(ControlMode.PercentOutput, -OUTAKE_SPEED);
 		intakeMode = OUT;
 	}
 
 	public void shoot() {
 		intakeMotorLeft.set(ControlMode.PercentOutput, SHOOT_SPEED);
-		intakeMotorRight.set(ControlMode.PercentOutput, SHOOT_SPEED);
+		intakeMotorRight.set(ControlMode.PercentOutput, -SHOOT_SPEED);
 		intakeMode = OUT;
 	}
 

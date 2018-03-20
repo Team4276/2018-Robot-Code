@@ -61,7 +61,7 @@ public class ArmPivoter extends Thread implements Runnable {
 
 	private void computeManualPowerOffset() {
 		if (Math.abs(Robot.xboxController.getRawAxis(Xbox.LAxisY)) > 0.15) {
-			manualPower = -Robot.xboxController.getRawAxis(Xbox.LAxisY) / 100;
+			manualPower = -Robot.xboxController.getRawAxis(Xbox.LAxisY) / 4;
 		}
 	}
 
@@ -216,7 +216,7 @@ public class ArmPivoter extends Thread implements Runnable {
 			manualOverrideIsEngaged = manualOverrideTogglerPivot.getMechanismState();
 			if (manualOverrideIsEngaged) {
 				computeManualPowerOffset();
-				commandedPower = commandedPower + manualPower;
+				commandedPower = manualPower;
 			} else {
 				determineSetpoint();
 				computeStaticPower();

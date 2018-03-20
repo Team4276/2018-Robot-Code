@@ -32,7 +32,7 @@ public class Elevator extends Thread implements Runnable {
 	private final double MAX_HEIGHT_UPPER = 6.125; // ft
 
 	// Constants - General
-	public final double STARTING_HEIGHT = 1.7; // ft
+	public final double STARTING_HEIGHT = 0; // ft
 	public final double SETPOINT_PREP = 2; // ft
 	public final double SETPOINT_SCALE = 5.75; // ft
 	public final double SETPOINT_SWITCH = 3; // ft
@@ -41,12 +41,13 @@ public class Elevator extends Thread implements Runnable {
 	private final double OVERRIDE_INCREMENT = 0.05; // 5%
 	private final double HEIGHT_PER_PULSE = -1.562 * 1e-4; // 1/6400
 	private final double MAX_POWER_UP = 0.7;
-	private final double MAX_POWER_DOWN = 0.7;
+	private final double MAX_POWER_DOWN = 0.1;
 	private final double HEIGHT_THRESHOLD = 2; // ft
 	private final double HEIGHT_COAST_RATE = 1; // ft/s
 
 	// General parameters
 	private boolean manualOverrideIsEngaged;
+	private boolean isClimbing = false;
 	private double encoderOffset = 0;
 	private double estimatedHeight = 0;
 	public double commandedHeight = STARTING_HEIGHT;
@@ -82,8 +83,7 @@ public class Elevator extends Thread implements Runnable {
 			manualPower = OVERRIDE_INCREMENT;
 		} else if (Robot.xboxController.getRawAxis(Xbox.RAxisY) > 0.15) {
 			manualPower = -OVERRIDE_INCREMENT;
-		}
-		else {
+		} else {
 			manualPower = 0;
 		}
 	}
@@ -165,11 +165,11 @@ public class Elevator extends Thread implements Runnable {
 			}
 
 			// Engage manual override if CAN bus is lost
-			//if (elevatorDriverMainR1.getSensorCollection().getQuadraturePosition() == 0
-			//		&& elevatorDriverMainR1.getSensorCollection().getQuadratureVelocity() == 0) {
-			//	manualOverrideToggler.setMechanismState(true);
-			//	activePower = 0;
-			//}
+			if (elevatorDriverMainR1.getSensorCollection().getQuadraturePosition() == 0
+					&& elevatorDriverMainR1.getSensorCollection().getQuadratureVelocity() == 0) {
+				manualOverrideToggler.setMechanismState(true);
+				activePower = 0;
+			}
 		}
 	}
 
@@ -179,6 +179,15 @@ public class Elevator extends Thread implements Runnable {
 			commandedPower = MAX_POWER_UP;
 		} else if (commandedPower < -MAX_POWER_DOWN) {
 			commandedPower = -MAX_POWER_DOWN;
+		}
+	}
+
+	private void limitCommandedPower(double maxClimbPower) {
+		// Limit the range of commanded power
+		if (commandedPower > MAX_POWER_UP) {
+			commandedPower = MAX_POWER_UP;
+		} else if (commandedPower < -maxClimbPower) {
+			commandedPower = -maxClimbPower;
 		}
 	}
 
@@ -274,25 +283,35 @@ public class Elevator extends Thread implements Runnable {
 	public void run() {
 		while (true) {
 			tuneControlGains(); // for gain tuning only - COMMENT THIS LINE OUT
-								// FOR COMPETITION
+								// FOR
+			// COMPETITION
 			manualOverrideToggler.updateMechanismState();
 			manualOverrideIsEngaged = manualOverrideToggler.getMechanismState();
 			if (manualOverrideIsEngaged) {
 				computeManualPowerOffset();
-				commandedPower = commandedPower + manualPower;
+				if (!Robot.climber.climberIsLocked) {
+					isClimbing = true;
+				}
+				commandedPower = staticPower + manualPower;
 			} else {
 				determineSetpoint();
 				computeStaticPower();
 				computeActivePower();
+				isClimbing = false;
 				commandedPower = staticPower + activePower;
 			}
+			if (!isClimbing) {
+				limitCommandedPower();
+			} else {
+				limitCommandedPower(.7);
+			}
 			limitCommandedPower();
-			elevatorDriverMainR1.set(ControlMode.PercentOutput, -commandedPower);
-			elevatorDriverR2.set(ControlMode.PercentOutput, -commandedPower);
+			elevatorDriverMainR1.set(ControlMode.PercentOutput, commandedPower);
+			elevatorDriverR2.set(ControlMode.PercentOutput, commandedPower);
 			// negative because facing opposite direction
 			// TODO test all motor directions
-			elevatorDriverL1.set(ControlMode.PercentOutput, commandedPower);
-			elevatorDriverL2.set(ControlMode.PercentOutput, commandedPower);
+			elevatorDriverL1.set(ControlMode.PercentOutput, -commandedPower);
+			elevatorDriverL2.set(ControlMode.PercentOutput, -commandedPower);
 			updateTelemetry();
 			Timer.delay(0.125);
 		}
