@@ -310,10 +310,10 @@ public class AutoMain {
 		} else if (setRoutine == LEFT_SCALE_AND_SWITCH || setRoutine == RIGHT_SCALE_AND_SWITCH) {
 			// set all false
 			stateEnabled[INIT] = true;
-			stateEnabled[DRIVE_OFF_WALL] = true;
-			stateEnabled[ROTATE_OFF_WALL] = true;
+			stateEnabled[DRIVE_OFF_WALL] = false;
+			stateEnabled[ROTATE_OFF_WALL] = false;
 			stateEnabled[DRIVE_TO_SCORE_1] = true;
-			stateEnabled[ROTATE_TO_SCORE] = true;
+			stateEnabled[ROTATE_TO_SCORE] = false;
 			stateEnabled[PREP_TO_SCORE] = true;
 			// stateEnabled[LOWER_ARM] = true;
 			stateEnabled[DRIVE_TO_SCORE_2] = true;
@@ -436,10 +436,10 @@ public class AutoMain {
 			} else if (setRoutine == CROSS_RIGHT_SWITCH) {
 				headingReached = Robot.driveTrain.driveToCoordinate(FieldLocations.LEFT_CROSS_ZONE);
 
-			} else if (setRoutine == LEFT_SCALE_AND_SWITCH) {
+			}  else if (setRoutine == CROSS_LEFT_SCALE_SWITCH) {
 				headingReached = Robot.driveTrain.driveToCoordinate(FieldLocations.RIGHT_CROSS_ZONE);
 
-			} else if (setRoutine == RIGHT_SCALE_AND_SWITCH) {
+			} else if (setRoutine == CROSS_RIGHT_SCALE_SWITCH) {
 				headingReached = Robot.driveTrain.driveToCoordinate(FieldLocations.LEFT_CROSS_ZONE);
 
 			} else {
@@ -467,13 +467,13 @@ public class AutoMain {
 			} else if (setRoutine == CROSS_RIGHT_SWITCH) {
 				headingReached = Robot.driveTrain.rotateToCoordinate(FieldLocations.RIGHT_JUNCTION);
 
-			} else if (setRoutine == LEFT_SCALE_AND_SWITCH) {
+			} else if (setRoutine == CROSS_LEFT_SCALE_SWITCH) {
 				headingReached = Robot.driveTrain.rotateToCoordinate(FieldLocations.LEFT_CROSS_ZONE);
 
-			} else if (setRoutine == RIGHT_SCALE_AND_SWITCH) {
+			} else if (setRoutine == CROSS_RIGHT_SCALE_SWITCH) {
 				headingReached = Robot.driveTrain.rotateToCoordinate(FieldLocations.RIGHT_CROSS_ZONE);
 
-			} else {
+			}else {
 				SmartDashboard.putNumber("Auto Error", ROUTINE_DETERMINE_ERROR);
 			}
 			// State exit
@@ -524,8 +524,10 @@ public class AutoMain {
 
 			} else if (setRoutine == CROSS_LEFT_SCALE_SWITCH) {
 				headingReached = Robot.driveTrain.driveToCoordinate(FieldLocations.LEFT_CROSS_ZONE);
+
 			} else if (setRoutine == CROSS_RIGHT_SCALE_SWITCH) {
 				headingReached = Robot.driveTrain.driveToCoordinate(FieldLocations.RIGHT_CROSS_ZONE);
+
 			} else {
 
 				SmartDashboard.putNumber("Auto Error", ROUTINE_DETERMINE_ERROR);
@@ -558,11 +560,11 @@ public class AutoMain {
 			} else if (setRoutine == CROSS_RIGHT_SWITCH) {
 				headingReached = Robot.driveTrain.rotateToCoordinate(FieldLocations.RIGHT_JUNCTION);
 
-			} else if (setRoutine == LEFT_SCALE_AND_SWITCH) {
-				headingReached = Robot.driveTrain.rotateToCoordinate(FieldLocations.LEFT_CROSS_ZONE);
+			} else if (setRoutine == CROSS_LEFT_SCALE_SWITCH) {
+				headingReached = Robot.driveTrain.rotateToCoordinate(FieldLocations.leftScaleScoringZoneA);
 
-			} else if (setRoutine == RIGHT_SCALE_AND_SWITCH) {
-				headingReached = Robot.driveTrain.rotateToCoordinate(FieldLocations.RIGHT_CROSS_ZONE);
+			} else if (setRoutine == CROSS_RIGHT_SCALE_SWITCH) {
+				headingReached = Robot.driveTrain.rotateToCoordinate(FieldLocations.rightScaleScoringZoneA);
 
 			} else {
 				SmartDashboard.putNumber("Auto Error", ROUTINE_DETERMINE_ERROR);
@@ -696,6 +698,7 @@ public class AutoMain {
 			}
 			// State exit
 			if (headingReached || phaseTimer.isExpired()) {
+				Robot.manipulator.stop();
 				performStateExit();
 			}
 
@@ -823,6 +826,8 @@ public class AutoMain {
 			}
 			// State exit
 			if (coordinateReached || phaseTimer.isExpired()) {
+
+				Robot.elevator.commandToSwitch();
 				Robot.driveTrain.resetDrive();
 				performStateExit();
 			}
@@ -833,7 +838,7 @@ public class AutoMain {
 			// State entry
 			if (performStateEntry) {
 				Robot.elevator.commandToSwitch();
-				phaseTimer.setTimer(0.5);
+				phaseTimer.setTimer(0.3);
 				performStateEntry = false;
 			}
 
@@ -849,11 +854,12 @@ public class AutoMain {
 
 		case EXIT:
 			Robot.driveTrain.resetDrive();
+			Robot.manipulator.stop();
 			currentStateName = "Autonomous Done";
 			break;
 
 		}
-
+		SmartDashboard.putString("Current State", currentStateName);
 	}
 
 	private void performStateExit() {

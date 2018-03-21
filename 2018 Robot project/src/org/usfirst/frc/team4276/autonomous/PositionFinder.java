@@ -30,8 +30,8 @@ public class PositionFinder extends Thread implements Runnable {
 		driveEncoderL = new Encoder(encoder1A, encoder1B);
 		driveEncoderR = new Encoder(encoder2A, encoder2B);
 
-		driveEncoderL.setDistancePerPulse(10 / 8304.316667);
-		driveEncoderR.setDistancePerPulse(10 / 8304.316667);
+		driveEncoderL.setDistancePerPulse((10 / 8304.316667)*0.000867019);
+		driveEncoderR.setDistancePerPulse((10 / 8304.316667)*0.000867019);
 
 		robotIMU = new ADIS16448_IMU();
 

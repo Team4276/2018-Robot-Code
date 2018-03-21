@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.GenericHID;
 
 public class Manipulator {
 	final double TRIGGER_THRESHOLD = 0.5;
@@ -20,7 +21,8 @@ public class Manipulator {
 	DigitalInput limitSwitch;
 
 	boolean autoGrabInit = true;
-	final double INTAKE_SPEED = 1;
+	boolean isIntaked = false;
+	final double INTAKE_SPEED = .5;
 	final double OUTAKE_SPEED = -0.3;
 	final double SHOOT_SPEED = -1;
 
@@ -74,7 +76,10 @@ public class Manipulator {
 	public void performMainProcessing() {
 
 		if (Robot.xboxController.getRawButton(Xbox.LB)) {
-			intake();
+			if(collect()){
+				Robot.xboxController.setRumble(GenericHID.RumbleType.kLeftRumble, .5);
+				Robot.xboxController.setRumble(GenericHID.RumbleType.kRightRumble, .5);
+			}
 		} else if (Robot.xboxController.getRawButton(Xbox.RB)) {
 			outake();
 		} else if (Robot.xboxController.getRawAxis(Xbox.RT) > TRIGGER_THRESHOLD) {
@@ -97,6 +102,8 @@ public class Manipulator {
 			readOut = "ERROR";
 		}
 		SmartDashboard.putString("Cube Arm Status", readOut);
+		isIntaked = limitSwitch.get();
+		SmartDashboard.putBoolean("WHERE MY F*CKING CUBE AT?!?!", isIntaked);
 		// SmartDashboard.putBoolean("manipulator open", manipulatorIsOpen);
 	}
 }

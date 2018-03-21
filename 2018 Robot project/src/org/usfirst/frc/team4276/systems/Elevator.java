@@ -18,26 +18,26 @@ public class Elevator extends Thread implements Runnable {
 	private Toggler manualOverrideToggler;
 
 	// Constants - Lower Rail
-	private double STATIC_GAIN_LOWER = 0.08;
-	private double KP_LOWER = 540 * 1e-3;
-	private double KI_LOWER = 0;
+	private double STATIC_GAIN_LOWER = 0.1;
+	private double KP_LOWER = 320 * 1e-3;
+	private double KI_LOWER = 15 * 1e-3;
 	private double KD_LOWER = 15 * 1e-3;
 	private final double MAX_HEIGHT_LOWER = 2.625; // ft
 
 	// Constants - Upper Rail
 	private double STATIC_GAIN_UPPER = STATIC_GAIN_LOWER;
-	private double KP_UPPER = 430 * 1e-3;
-	private double KI_UPPER = KI_LOWER;
+	private double KP_UPPER = 310 * 1e-3;
+	private double KI_UPPER = 25 * 1e-3;
 	private double KD_UPPER = 25 * 1e-3;
 	private final double MAX_HEIGHT_UPPER = 6.125; // ft
 
 	// Constants - General
 	public final double STARTING_HEIGHT = 0; // ft
-	public final double SETPOINT_PREP = 2; // ft
+	public final double SETPOINT_PREP = 1; // ft
 	public final double SETPOINT_SCALE = 5.75; // ft
-	public final double SETPOINT_SWITCH = 3; // ft
+	public final double SETPOINT_SWITCH = 2; // ft
 	public final double SETPOINT_BOTTOM = 0; // ft
-	private final double SETPOINT_INCREMENT = .2; // ft
+	private final double SETPOINT_INCREMENT = .1; // ft
 	private final double OVERRIDE_INCREMENT = 0.05; // 5%
 	private final double HEIGHT_PER_PULSE = -1.562 * 1e-4; // 1/6400
 	private final double MAX_POWER_UP = 0.7;
@@ -282,7 +282,7 @@ public class Elevator extends Thread implements Runnable {
 
 	public void run() {
 		while (true) {
-			tuneControlGains(); // for gain tuning only - COMMENT THIS LINE OUT
+			//tuneControlGains(); // for gain tuning only - COMMENT THIS LINE OUT
 								// FOR
 			// COMPETITION
 			manualOverrideToggler.updateMechanismState();
@@ -306,14 +306,14 @@ public class Elevator extends Thread implements Runnable {
 				limitCommandedPower(.7);
 			}
 			limitCommandedPower();
-			elevatorDriverMainR1.set(ControlMode.PercentOutput, commandedPower);
-			elevatorDriverR2.set(ControlMode.PercentOutput, commandedPower);
+			elevatorDriverMainR1.set(ControlMode.PercentOutput, -commandedPower);
+			elevatorDriverR2.set(ControlMode.PercentOutput, -commandedPower);
 			// negative because facing opposite direction
 			// TODO test all motor directions
-			elevatorDriverL1.set(ControlMode.PercentOutput, -commandedPower);
-			elevatorDriverL2.set(ControlMode.PercentOutput, -commandedPower);
+			elevatorDriverL1.set(ControlMode.PercentOutput, commandedPower);
+			elevatorDriverL2.set(ControlMode.PercentOutput, commandedPower);
 			updateTelemetry();
-			Timer.delay(0.125);
+			Timer.delay(0.0625);
 		}
 	}
 }
