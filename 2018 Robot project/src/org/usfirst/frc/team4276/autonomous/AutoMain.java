@@ -216,7 +216,11 @@ public class AutoMain {
 					// if all scoring is on right side
 					SmartDashboard.putNumber("Auto Error", ROUTE_PLAN_ERROR);
 				}
+			} else if (Robot.routineSelector.strategy == Robot.routineSelector.CROSS_BASE) {
+			setRoutine = DEFAULT;
+			
 			} else {
+
 				SmartDashboard.putNumber("Auto Error", ROUTE_PLAN_ERROR);
 			}
 		}
@@ -436,7 +440,7 @@ public class AutoMain {
 			} else if (setRoutine == CROSS_RIGHT_SWITCH) {
 				headingReached = Robot.driveTrain.driveToCoordinate(FieldLocations.LEFT_CROSS_ZONE);
 
-			}  else if (setRoutine == CROSS_LEFT_SCALE_SWITCH) {
+			} else if (setRoutine == CROSS_LEFT_SCALE_SWITCH) {
 				headingReached = Robot.driveTrain.driveToCoordinate(FieldLocations.RIGHT_CROSS_ZONE);
 
 			} else if (setRoutine == CROSS_RIGHT_SCALE_SWITCH) {
@@ -473,7 +477,7 @@ public class AutoMain {
 			} else if (setRoutine == CROSS_RIGHT_SCALE_SWITCH) {
 				headingReached = Robot.driveTrain.rotateToCoordinate(FieldLocations.RIGHT_CROSS_ZONE);
 
-			}else {
+			} else {
 				SmartDashboard.putNumber("Auto Error", ROUTINE_DETERMINE_ERROR);
 			}
 			// State exit

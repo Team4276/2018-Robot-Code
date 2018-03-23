@@ -76,10 +76,11 @@ public class Manipulator {
 	public void performMainProcessing() {
 
 		if (Robot.xboxController.getRawButton(Xbox.LB)) {
-			if(collect()){
+			/*if(collect()){
 				Robot.xboxController.setRumble(GenericHID.RumbleType.kLeftRumble, .5);
 				Robot.xboxController.setRumble(GenericHID.RumbleType.kRightRumble, .5);
-			}
+			}*/
+			intake();
 		} else if (Robot.xboxController.getRawButton(Xbox.RB)) {
 			outake();
 		} else if (Robot.xboxController.getRawAxis(Xbox.RT) > TRIGGER_THRESHOLD) {
@@ -103,7 +104,7 @@ public class Manipulator {
 		}
 		SmartDashboard.putString("Cube Arm Status", readOut);
 		isIntaked = limitSwitch.get();
-		SmartDashboard.putBoolean("WHERE MY F*CKING CUBE AT?!?!", isIntaked);
+		SmartDashboard.putBoolean("cube acquired", isIntaked);
 		// SmartDashboard.putBoolean("manipulator open", manipulatorIsOpen);
 	}
 }

@@ -18,10 +18,10 @@ public class Elevator extends Thread implements Runnable {
 	private Toggler manualOverrideToggler;
 
 	// Constants - Lower Rail
-	private double STATIC_GAIN_LOWER = 0.1;
-	private double KP_LOWER = 320 * 1e-3;
-	private double KI_LOWER = 15 * 1e-3;
-	private double KD_LOWER = 15 * 1e-3;
+	private double STATIC_GAIN_LOWER = 0;
+	private double KP_LOWER = 0 * 1e-3;
+	private double KI_LOWER = 0 * 1e-3;
+	private double KD_LOWER = 0 * 1e-3;
 	private final double MAX_HEIGHT_LOWER = 2.625; // ft
 
 	// Constants - Upper Rail
@@ -38,7 +38,7 @@ public class Elevator extends Thread implements Runnable {
 	public final double SETPOINT_SWITCH = 2; // ft
 	public final double SETPOINT_BOTTOM = 0; // ft
 	private final double SETPOINT_INCREMENT = .1; // ft
-	private final double OVERRIDE_INCREMENT = 0.05; // 5%
+	private final double OVERRIDE_INCREMENT = 0.2; // 5%
 	private final double HEIGHT_PER_PULSE = -1.562 * 1e-4; // 1/6400
 	private final double MAX_POWER_UP = 0.7;
 	private final double MAX_POWER_DOWN = 0.1;
@@ -71,7 +71,7 @@ public class Elevator extends Thread implements Runnable {
 		elevatorDriverR2 = new VictorSPX(elevator2CANPort);
 		elevatorDriverL1 = new VictorSPX(elevator3CANPort);
 		elevatorDriverL2 = new VictorSPX(elevator4CANPort);
-		manualOverrideToggler = new Toggler(Xbox.Back);
+		manualOverrideToggler = new Toggler(Xbox.Start);
 
 		// elevatorDriverFollow.set(ControlMode.Follower, elevator1CANPort);
 		encoderOffset = STARTING_HEIGHT
@@ -164,12 +164,6 @@ public class Elevator extends Thread implements Runnable {
 				activePower = (KP_UPPER * heightError) + (KI_UPPER * accumulatedError) + (KD_UPPER * rateError);
 			}
 
-			// Engage manual override if CAN bus is lost
-			if (elevatorDriverMainR1.getSensorCollection().getQuadraturePosition() == 0
-					&& elevatorDriverMainR1.getSensorCollection().getQuadratureVelocity() == 0) {
-				manualOverrideToggler.setMechanismState(true);
-				activePower = 0;
-			}
 		}
 	}
 
@@ -283,8 +277,7 @@ public class Elevator extends Thread implements Runnable {
 	public void run() {
 		while (true) {
 			//tuneControlGains(); // for gain tuning only - COMMENT THIS LINE OUT
-								// FOR
-			// COMPETITION
+								  // FOR COMPETITION
 			manualOverrideToggler.updateMechanismState();
 			manualOverrideIsEngaged = manualOverrideToggler.getMechanismState();
 			if (manualOverrideIsEngaged) {

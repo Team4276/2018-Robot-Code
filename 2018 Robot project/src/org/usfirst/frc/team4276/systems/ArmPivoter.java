@@ -18,16 +18,16 @@ public class ArmPivoter extends Thread implements Runnable {
 	private SoftwareTimer armTimer;
 
 	// Constants
-	private double STATIC_GAIN = 0.14;
-	private double PROPORTIONAL_GAIN = 7900 *1e-6;
-	private double INTEGRAL_GAIN = 90 *1e-6;
-	private double DERIVATIVE_GAIN = 390 *1e-6;
-	private final double STARTING_ANGLE = 0;
+	private double STATIC_GAIN = 0.37;//0.41 max 0.34 min
+	private double PROPORTIONAL_GAIN = 00 *1e-6;
+	private double INTEGRAL_GAIN = 0 *1e-6;
+	private double DERIVATIVE_GAIN = 0 *1e-6;
+	private final double STARTING_ANGLE = 90;
 	private final double SETPOINT_INCREMENT = 5; // deg
 	private final double MAX_POWER = 1;
 	private final double UPPER_LIMIT = 85;
-	private final double LOWER_LIMIT = -85;
-	private final double DEGREES_PER_PULSE = 0.000623211;// 5.612 * 1e-4 1/22/81
+	private final double LOWER_LIMIT = -10;
+	private final double DEGREES_PER_PULSE = 1; // was 6.23211 *1e-4
 	private final double ANGLE_THRESHOLD = 90; // deg
 	private final double ANGLE_COAST_RATE = 90; // deg/s
 
@@ -54,20 +54,20 @@ public class ArmPivoter extends Thread implements Runnable {
 
 	public ArmPivoter(int pivoterCANPort) {
 		pivoter = new TalonSRX(pivoterCANPort);
-		manualOverrideTogglerPivot = new Toggler(Xbox.Start);
+		manualOverrideTogglerPivot = new Toggler(Xbox.Back);
 		armTimer = new SoftwareTimer();
 		encoderOffset = STARTING_ANGLE - pivoter.getSensorCollection().getQuadraturePosition() * DEGREES_PER_PULSE;
 	}
 
-	private void computeManualPowerOffset() {
-		if (Math.abs(Robot.xboxController.getRawAxis(Xbox.LAxisY)) > 0.15) {
-			manualPower = -Robot.xboxController.getRawAxis(Xbox.LAxisY) / 2;
+	private void computeManualPower() {
+		if (Math.abs(Robot.xboxController.getRawAxis(Xbox.LAxisY)) > 0.2) {
+			manualPower = -Robot.xboxController.getRawAxis(Xbox.LAxisY) / 1.5;
 		}
 	}
 
 	private void computeStaticPower() {
 		/**
-		 * torque = m*(g+a)*Xcom*cos(theta), where a=0 (for now)
+		 * torque = m*(g+a)*xCM*cos(theta), where a=0 (for now)
 		 */
 
 		// double mass = 6.8; // placeholder
@@ -75,8 +75,7 @@ public class ArmPivoter extends Thread implements Runnable {
 		// double acceleration = 0; // placeholder
 		// double xCM = .203; // placeholder
 		// assignedPower = TORQUE_GAIN * (mass * (gravity + acceleration) * xCM
-		// *
-		// Math.cos(theta));
+		// * Math.cos(theta));
 
 		double theta = estimatedAngle * (Math.PI / 180); // rad
 		staticPower = STATIC_GAIN * Math.cos(theta);
@@ -105,21 +104,14 @@ public class ArmPivoter extends Thread implements Runnable {
 			// For large height errors, follow coast speed until close to target
 			if (angleError > ANGLE_THRESHOLD) {
 				angleError = ANGLE_THRESHOLD; // limiting to 90 deg
-				rateError = ANGLE_COAST_RATE + rateError; // coast speed = 90
-															// deg/s
+				rateError = ANGLE_COAST_RATE + rateError; // coast speed = 90 deg/s
 			}
 
 			// Compute PID active power
 			activePower = PROPORTIONAL_GAIN * angleError + INTEGRAL_GAIN * accumulatedError
 					+ DERIVATIVE_GAIN * rateError;
 
-			// Engage manual override if CAN bus is lost
-			/*
-			 * if (pivoter.getSensorCollection().getQuadraturePosition() == 0 &&
-			 * pivoter.getSensorCollection().getQuadratureVelocity() == 0) {
-			 * manualOverrideTogglerPivot.setMechanismState(true); activePower =
-			 * 0; }
-			 */
+
 		}
 	}
 
@@ -212,13 +204,13 @@ public class ArmPivoter extends Thread implements Runnable {
 
 	public void run() {
 		while (true) {
-			//tuneControlGains(); // for gain tuning only - COMMENT THIS LINE
+			tuneControlGains(); // for gain tuning only - COMMENT THIS LINE
 			// OUT FOR
 			// COMPETITION
 			manualOverrideTogglerPivot.updateMechanismState();
 			manualOverrideIsEngaged = manualOverrideTogglerPivot.getMechanismState();
 			if (manualOverrideIsEngaged) {
-				computeManualPowerOffset();
+				computeManualPower();
 				computeStaticPower();
 				computeActivePower();
 				commandedPower = manualPower;
