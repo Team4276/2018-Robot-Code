@@ -19,15 +19,15 @@ public class ArmPivoter extends Thread implements Runnable {
 
 	// Constants
 	private double STATIC_GAIN = 0.37;//0.41 max 0.34 min
-	private double PROPORTIONAL_GAIN = 00 *1e-6;
-	private double INTEGRAL_GAIN = 0 *1e-6;
-	private double DERIVATIVE_GAIN = 0 *1e-6;
+	private double PROPORTIONAL_GAIN = 11600 *1e-6;
+	private double INTEGRAL_GAIN = 430 *1e-6;
+	private double DERIVATIVE_GAIN = 3110 *1e-6;
 	private final double STARTING_ANGLE = 90;
 	private final double SETPOINT_INCREMENT = 5; // deg
 	private final double MAX_POWER = 1;
 	private final double UPPER_LIMIT = 85;
 	private final double LOWER_LIMIT = -10;
-	private final double DEGREES_PER_PULSE = 1; // was 6.23211 *1e-4
+	private final double DEGREES_PER_PULSE = 0.0004459828; // was 6.23211 *1e-4
 	private final double ANGLE_THRESHOLD = 90; // deg
 	private final double ANGLE_COAST_RATE = 90; // deg/s
 
@@ -61,7 +61,9 @@ public class ArmPivoter extends Thread implements Runnable {
 
 	private void computeManualPower() {
 		if (Math.abs(Robot.xboxController.getRawAxis(Xbox.LAxisY)) > 0.2) {
-			manualPower = -Robot.xboxController.getRawAxis(Xbox.LAxisY) / 1.5;
+			manualPower = -Robot.xboxController.getRawAxis(Xbox.LAxisY) / 2;
+		} else {
+			manualPower = 0;
 		}
 	}
 
@@ -167,11 +169,6 @@ public class ArmPivoter extends Thread implements Runnable {
 		if (Robot.logitechJoystickL.getRawButton(12) == true) {
 			DERIVATIVE_GAIN = DERIVATIVE_GAIN - 10e-6;
 		}
-		SmartDashboard.putNumber("Pivoter Kstatic", STATIC_GAIN);
-		SmartDashboard.putNumber("Pivoter Kp*1e-6", PROPORTIONAL_GAIN * 1e6);
-		SmartDashboard.putNumber("Pivoter Ki*1e-6", INTEGRAL_GAIN * 1e6);
-		SmartDashboard.putNumber("Pivoter Kd*1e-6", DERIVATIVE_GAIN * 1e6);
-		SmartDashboard.putNumber("Pivoter Power", commandedPower);
 	}
 
 	private void updateTelemetry() {
@@ -179,6 +176,13 @@ public class ArmPivoter extends Thread implements Runnable {
 		SmartDashboard.putNumber("Commanded Arm Angle", commandedAngle);
 		SmartDashboard.putNumber("Estimated Arm Angle", estimatedAngle);
 		SmartDashboard.putBoolean("Pivoter override", manualOverrideIsEngaged);
+		
+
+		SmartDashboard.putNumber("Pivoter Kstatic", STATIC_GAIN);
+		SmartDashboard.putNumber("Pivoter Kp*1e-6", PROPORTIONAL_GAIN * 1e6);
+		SmartDashboard.putNumber("Pivoter Ki*1e-6", INTEGRAL_GAIN * 1e6);
+		SmartDashboard.putNumber("Pivoter Kd*1e-6", DERIVATIVE_GAIN * 1e6);
+		SmartDashboard.putNumber("Pivoter Power", commandedPower);
 	}
 
 	public void commandSetpoint(double setpoint) {
@@ -204,7 +208,7 @@ public class ArmPivoter extends Thread implements Runnable {
 
 	public void run() {
 		while (true) {
-			tuneControlGains(); // for gain tuning only - COMMENT THIS LINE
+			//tuneControlGains(); // for gain tuning only - COMMENT THIS LINE
 			// OUT FOR
 			// COMPETITION
 			manualOverrideTogglerPivot.updateMechanismState();

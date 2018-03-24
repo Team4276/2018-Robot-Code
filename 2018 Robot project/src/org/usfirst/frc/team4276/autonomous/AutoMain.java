@@ -217,8 +217,8 @@ public class AutoMain {
 					SmartDashboard.putNumber("Auto Error", ROUTE_PLAN_ERROR);
 				}
 			} else if (Robot.routineSelector.strategy == Robot.routineSelector.CROSS_BASE) {
-			setRoutine = DEFAULT;
-			
+				setRoutine = DEFAULT;
+
 			} else {
 
 				SmartDashboard.putNumber("Auto Error", ROUTE_PLAN_ERROR);
@@ -409,8 +409,12 @@ public class AutoMain {
 
 			// State exit
 			if (phaseTimer.isExpired()) {
-				Robot.elevator.commandedHeight = Robot.elevator.SETPOINT_PREP;
-				Robot.armPivoter.commandSetpoint(ARM_OUT);
+				if (setRoutine == DEFAULT) {
+
+				} else {
+					Robot.elevator.commandedHeight = Robot.elevator.SETPOINT_SWITCH;
+					Robot.armPivoter.commandSetpoint(ARM_OUT);
+				}
 				performStateExit();
 			}
 
@@ -423,7 +427,7 @@ public class AutoMain {
 			if (performStateEntry) {
 				if (setRoutine == DEFAULT) {
 
-					phaseTimer.setTimer(1.5);
+					phaseTimer.setTimer(3.5);
 				} else {
 					phaseTimer.setTimer(4);
 				}

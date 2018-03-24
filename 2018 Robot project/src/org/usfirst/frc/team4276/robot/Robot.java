@@ -79,15 +79,15 @@ public class Robot extends SampleRobot {
 			// driveTrain.rotateToHeading(90);
 			// driveTrain.rotateToCoordinate(desiredCoordinate);
 			// if (driveTrain.driveToCoordinate(desiredCoordinate));
-			//autoMain.loop();
+			autoMain.loop();
 			Timer.delay(0.05);
 		}
 	}
 
 	public void operatorControl() {
-		//armPivoter.initializeThread();
+		armPivoter.initializeThread();
 		elevator.initializeThread();
-		// positionFinder.kill();
+		//positionFinder.kill();
 		routineSelector.kill();
 		driveTrain.resetDrive();
 		manipulator.stop();

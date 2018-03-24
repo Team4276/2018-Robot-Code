@@ -30,8 +30,8 @@ public class PositionFinder extends Thread implements Runnable {
 		driveEncoderL = new Encoder(encoder1A, encoder1B);
 		driveEncoderR = new Encoder(encoder2A, encoder2B);
 
-		driveEncoderL.setDistancePerPulse((10 / 10));// was 10 / 8304.316667
-		driveEncoderR.setDistancePerPulse((10 / 10));
+		driveEncoderL.setDistancePerPulse((10 / 9805.25));// was 10 / 8304.316667
+		driveEncoderR.setDistancePerPulse((10 / 9805.25));
 
 		robotIMU = new ADIS16448_IMU();
 
@@ -65,8 +65,8 @@ public class PositionFinder extends Thread implements Runnable {
 		SmartDashboard.putNumber("RIGHT ENCODER", PR);
 
 		//disable to calibrate
-		//driveEncoderL.reset();
-		//driveEncoderR.reset();
+		driveEncoderL.reset();
+		driveEncoderR.reset();
 		
 		double deltaPosition = 0.5 * (PL + PR);
 		double deltaX = Math.cos(currentHeadingRad) * deltaPosition;

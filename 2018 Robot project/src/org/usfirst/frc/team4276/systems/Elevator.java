@@ -19,16 +19,16 @@ public class Elevator extends Thread implements Runnable {
 
 	// Constants - Lower Rail
 	private double STATIC_GAIN_LOWER = 0;
-	private double KP_LOWER = 0 * 1e-3;
-	private double KI_LOWER = 0 * 1e-3;
-	private double KD_LOWER = 0 * 1e-3;
+	private double KP_LOWER = 490 * 1e-3;
+	private double KI_LOWER = 11 * 1e-3;
+	private double KD_LOWER = 21 * 1e-3;
 	private final double MAX_HEIGHT_LOWER = 2.625; // ft
 
 	// Constants - Upper Rail
 	private double STATIC_GAIN_UPPER = STATIC_GAIN_LOWER;
-	private double KP_UPPER = 310 * 1e-3;
-	private double KI_UPPER = 25 * 1e-3;
-	private double KD_UPPER = 25 * 1e-3;
+	private double KP_UPPER = 490 * 1e-3;
+	private double KI_UPPER = 11 * 1e-3;
+	private double KD_UPPER = 21 * 1e-3;
 	private final double MAX_HEIGHT_UPPER = 6.125; // ft
 
 	// Constants - General
@@ -38,10 +38,10 @@ public class Elevator extends Thread implements Runnable {
 	public final double SETPOINT_SWITCH = 2; // ft
 	public final double SETPOINT_BOTTOM = 0; // ft
 	private final double SETPOINT_INCREMENT = .1; // ft
-	private final double OVERRIDE_INCREMENT = 0.2; // 5%
+	private final double OVERRIDE_INCREMENT = 0.3; // 5%
 	private final double HEIGHT_PER_PULSE = -1.562 * 1e-4; // 1/6400
 	private final double MAX_POWER_UP = 0.7;
-	private final double MAX_POWER_DOWN = 0.1;
+	private final double MAX_POWER_DOWN = 0.4;
 	private final double HEIGHT_THRESHOLD = 2; // ft
 	private final double HEIGHT_COAST_RATE = 1; // ft/s
 
@@ -276,16 +276,20 @@ public class Elevator extends Thread implements Runnable {
 
 	public void run() {
 		while (true) {
-			//tuneControlGains(); // for gain tuning only - COMMENT THIS LINE OUT
-								  // FOR COMPETITION
+			tuneControlGains(); // for gain tuning only - COMMENT THIS LINE OUT
+								// FOR COMPETITION
 			manualOverrideToggler.updateMechanismState();
 			manualOverrideIsEngaged = manualOverrideToggler.getMechanismState();
 			if (manualOverrideIsEngaged) {
 				computeManualPowerOffset();
-				if (!Robot.climber.climberIsLocked) {
+				if (Robot.xboxController.getPOV(Xbox.DPad) == Xbox.POVdown) {
 					isClimbing = true;
+					commandedPower = -.7;
+				} else {
+					isClimbing = false;
+					commandedPower = staticPower + manualPower;
 				}
-				commandedPower = staticPower + manualPower;
+				computeActivePower();
 			} else {
 				determineSetpoint();
 				computeStaticPower();

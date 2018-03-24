@@ -160,9 +160,7 @@ public class DriveTrain {
 		rightDrivePower = -1 * (PROPORTIONAL_GAIN * headingErrorCurrent + INTEGRAL_GAIN * accumulatedError);
 
 		if (Math.abs(headingErrorCurrent) < POSITION_DEADBAND /*
-																 * && Math.abs(
-																 * errorRate) <
-																 * RATE_DEADBAND
+																 * && Math.abs( errorRate) < RATE_DEADBAND
 																 */) {
 			status = true;
 			leftDrivePower = 0;
@@ -228,8 +226,9 @@ public class DriveTrain {
 			timeNow = Robot.systemTimer.get();
 			driveInit = false;
 		}
-		double desiredHeading = Math.toDegrees(Math.atan2(desiredCoordinate[1] - PositionFinder.getCurrentLocation()[1],
-				desiredCoordinate[0] - PositionFinder.getCurrentLocation()[0]));
+		double desiredHeading = Math
+				.toDegrees(Math.atan2((desiredCoordinate[1] - PositionFinder.getCurrentLocation()[1]),
+						(desiredCoordinate[0] - PositionFinder.getCurrentLocation()[0])));
 		// calculates heading needed to face coordinates based on inputed array
 
 		boolean status = false;
@@ -250,15 +249,12 @@ public class DriveTrain {
 
 		SmartDashboard.putNumber("Distance Error", errorCurrent);
 
-		double errorRate = (errorCurrent - errorLast) / timeStep; // integral
-
 		final double MAX_POWER = 0.7;
 		final double LINEAR_PROPORTIONAL_GAIN = .08;
 		final double LINEAR_INTEGRAL_GAIN = 0.007;
-		double ANGLER_PROPORTIONAL_GAIN = .005; // degrees
-		final double ANGLE_DEADBAND = 1; // feet
+		double ANGLER_PROPORTIONAL_GAIN = .005;
+		final double ANGLE_DEADBAND = 1;// degrees
 		final double LINEAR_DEADBAND = 0.3; // feet
-		final double LINEAR_RATE_DEADBAND = .5; // feet per second
 
 		boolean facingTarget = (Math.abs(headingError) < 90);
 
@@ -314,8 +310,8 @@ public class DriveTrain {
 	public void goForward(boolean isForward) {
 
 		if (isForward) {
-			leftDrivePower = -.25;
-			rightDrivePower = -.25;
+			leftDrivePower = -.5;
+			rightDrivePower = -.5;
 		} else {
 			leftDrivePower = 0;
 			rightDrivePower = 0;
