@@ -27,7 +27,7 @@ public class ArmPivoter extends Thread implements Runnable {
 	private final double MAX_POWER = 1;
 	private final double UPPER_LIMIT = 85;
 	private final double LOWER_LIMIT = -10;
-	private final double DEGREES_PER_PULSE = 0.0004459828; // was 6.23211 *1e-4
+	private final double DEGREES_PER_PULSE = 5.506 * 1e-4; // 0.0004459828 actual robot
 	private final double ANGLE_THRESHOLD = 90; // deg
 	private final double ANGLE_COAST_RATE = 90; // deg/s
 

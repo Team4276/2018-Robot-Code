@@ -121,7 +121,7 @@ public class PositionFinder extends Thread implements Runnable {
 				break;
 			}
 
-			Timer.delay(00.125);
+			Timer.delay(00.05);
 		}
 	}
 }

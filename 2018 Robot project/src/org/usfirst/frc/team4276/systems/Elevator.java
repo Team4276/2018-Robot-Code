@@ -38,8 +38,8 @@ public class Elevator extends Thread implements Runnable {
 	public final double SETPOINT_SWITCH = 3; // ft
 	public final double SETPOINT_BOTTOM = 0; // ft
 	private final double SETPOINT_INCREMENT = .1; // ft
-	private final double OVERRIDE_INCREMENT = 0.3; // 5%
-	private final double HEIGHT_PER_PULSE = -1.562 * 1e-4; // 1/6400
+	private final double OVERRIDE_INCREMENT = 0.3; // 30%
+	private final double HEIGHT_PER_PULSE = (-1.562 * 1e-4)*2; // 2*(1/6400) times 2 for cascade system
 	private final double MAX_POWER_UP = 0.7;
 	private final double MAX_POWER_DOWN = 0.4;
 	private final double HEIGHT_THRESHOLD = 2; // ft
