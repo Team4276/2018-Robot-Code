@@ -33,9 +33,9 @@ public class Elevator extends Thread implements Runnable {
 
 	// Constants - General
 	public final double STARTING_HEIGHT = 0; // ft
-	public final double SETPOINT_PREP = 1; // ft
+	public final double SETPOINT_PREP = 2; // ft
 	public final double SETPOINT_SCALE = 5.75; // ft
-	public final double SETPOINT_SWITCH = 2; // ft
+	public final double SETPOINT_SWITCH = 3; // ft
 	public final double SETPOINT_BOTTOM = 0; // ft
 	private final double SETPOINT_INCREMENT = .1; // ft
 	private final double OVERRIDE_INCREMENT = 0.3; // 5%

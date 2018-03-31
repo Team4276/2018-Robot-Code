@@ -58,8 +58,8 @@ public class PositionFinder extends Thread implements Runnable {
 	}
 
 	private void updatePosition() {
-		double PL = driveEncoderL.getDistance();
-		double PR = -1 * driveEncoderR.getDistance();
+		double PL = -1*driveEncoderL.getDistance();
+		double PR =  driveEncoderR.getDistance();
 
 		SmartDashboard.putNumber("LEFT ENCODER", PL);
 		SmartDashboard.putNumber("RIGHT ENCODER", PR);

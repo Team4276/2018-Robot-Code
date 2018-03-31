@@ -250,9 +250,9 @@ public class DriveTrain {
 		SmartDashboard.putNumber("Distance Error", errorCurrent);
 
 		final double MAX_POWER = 0.7;
-		final double LINEAR_PROPORTIONAL_GAIN = .08;
+		final double LINEAR_PROPORTIONAL_GAIN = .09;
 		final double LINEAR_INTEGRAL_GAIN = 0.007;
-		double ANGLER_PROPORTIONAL_GAIN = .005;
+		double ANGLER_PROPORTIONAL_GAIN = .007;
 		final double ANGLE_DEADBAND = 1;// degrees
 		final double LINEAR_DEADBAND = 0.3; // feet
 

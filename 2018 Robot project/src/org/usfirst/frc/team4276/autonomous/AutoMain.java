@@ -399,7 +399,7 @@ public class AutoMain {
 				planRoute();
 				defineStateEnabledStatus();
 
-				Robot.driveTrain.setHiGear();
+				Robot.driveTrain.setLoGear();
 				phaseTimer.setTimer(0.2);
 				performStateEntry = false;
 
