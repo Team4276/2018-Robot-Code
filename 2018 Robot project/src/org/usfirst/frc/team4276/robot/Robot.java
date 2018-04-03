@@ -75,11 +75,11 @@ public class Robot extends SampleRobot {
 		armPivoter.initializeThread();
 		elevator.initializeThread();
 		while (isAutonomous() && isEnabled()) {
-			double desiredCoordinate[] = { -6, 2 };
+			double desiredCoordinate[] = { 10, 0 };
 			// driveTrain.rotateToHeading(90);
 			//driveTrain.rotateToCoordinate(desiredCoordinate);
-			// if (driveTrain.driveToCoordinate(desiredCoordinate));
-			autoMain.loop();
+			if (driveTrain.driveToCoordinate(desiredCoordinate));
+			// autoMain.loop();
 			Timer.delay(0.05);
 		}
 	}

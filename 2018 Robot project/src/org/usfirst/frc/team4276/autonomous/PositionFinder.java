@@ -22,6 +22,9 @@ public class PositionFinder extends Thread implements Runnable {
 	static double currentX = 0;
 	static double currentY = 0;
 
+	double previousLeft = 0;
+	double previousRight = 0;
+
 	public boolean breakLoop = false;
 	private static boolean skipXYAssignment = false;
 
@@ -30,8 +33,9 @@ public class PositionFinder extends Thread implements Runnable {
 		driveEncoderL = new Encoder(encoder1A, encoder1B);
 		driveEncoderR = new Encoder(encoder2A, encoder2B);
 
-		driveEncoderL.setDistancePerPulse((10 / 10418.69));// was 10 / 8304.316667
-		driveEncoderR.setDistancePerPulse((10 / 10418.69));
+		driveEncoderL.setDistancePerPulse((10 / 11564.75));// was 10 /
+															// 8304.316667
+		driveEncoderR.setDistancePerPulse((10 / 11564.75));
 
 		robotIMU = new ADIS16448_IMU();
 
@@ -58,16 +62,22 @@ public class PositionFinder extends Thread implements Runnable {
 	}
 
 	private void updatePosition() {
-		double PL = -1*driveEncoderL.getDistance();
-		double PR =  driveEncoderR.getDistance();
+		double currentLeft = driveEncoderL.getDistance();
+		double PL = -1 * (currentLeft - previousLeft);
+		previousLeft = currentLeft;
+		//driveEncoderL.reset(); // disable to calibrate
+
+		double currentRight = driveEncoderR.getDistance();
+		double PR = currentRight - previousRight;
+		previousRight = currentRight;
+		//driveEncoderR.reset(); // disable to calibrate
 
 		SmartDashboard.putNumber("LEFT ENCODER", PL);
 		SmartDashboard.putNumber("RIGHT ENCODER", PR);
 
-		//disable to calibrate
-		driveEncoderL.reset();
-		driveEncoderR.reset();
-		
+		SmartDashboard.putNumber("LEFT ENCODER Raw", currentLeft);
+		SmartDashboard.putNumber("RIGHT ENCODER Raw", currentRight);
+
 		double deltaPosition = 0.5 * (PL + PR);
 		double deltaX = Math.cos(currentHeadingRad) * deltaPosition;
 		double deltaY = Math.sin(currentHeadingRad) * deltaPosition;
