@@ -249,10 +249,10 @@ public class DriveTrain {
 
 		SmartDashboard.putNumber("Distance Error", errorCurrent);
 
-		final double MAX_POWER = 0.7;
+		final double MAX_POWER = 0.5;
 		final double LINEAR_PROPORTIONAL_GAIN = .09;
-		final double LINEAR_INTEGRAL_GAIN = 0.007;
-		double ANGLER_PROPORTIONAL_GAIN = .007;
+		final double LINEAR_INTEGRAL_GAIN = 0.009;
+		double ANGLER_PROPORTIONAL_GAIN = .008;
 		final double ANGLE_DEADBAND = 1;// degrees
 		final double LINEAR_DEADBAND = 0.3; // feet
 
@@ -288,6 +288,12 @@ public class DriveTrain {
 
 		if (rightDrivePower > MAX_POWER)
 			rightDrivePower = MAX_POWER;
+		
+		if (leftDrivePower < -MAX_POWER)
+			leftDrivePower = -MAX_POWER;
+
+		if (rightDrivePower < -MAX_POWER)
+			rightDrivePower = -MAX_POWER;
 
 		setMotorSpeeds();
 		driveMode = "Driving to: " + desiredCoordinate[0] + "," + desiredCoordinate[1];

@@ -18,10 +18,10 @@ public class Elevator extends Thread implements Runnable {
 	private Toggler manualOverrideToggler;
 
 	// Constants - Lower Rail
-	private double STATIC_GAIN_LOWER = 0;
-	private double KP_LOWER = 490 * 1e-3;
-	private double KI_LOWER = 11 * 1e-3;
-	private double KD_LOWER = 21 * 1e-3;
+	private double STATIC_GAIN_LOWER = .13;
+	private double KP_LOWER = 0 * 1e-3;
+	private double KI_LOWER = 0 * 1e-3;
+	private double KD_LOWER = 0 * 1e-3;
 	private final double MAX_HEIGHT_LOWER = 2.625; // ft
 
 	// Constants - Upper Rail
@@ -39,9 +39,9 @@ public class Elevator extends Thread implements Runnable {
 	public final double SETPOINT_BOTTOM = 0; // ft
 	private final double SETPOINT_INCREMENT = .1; // ft
 	private final double OVERRIDE_INCREMENT = 0.3; // 30%
-	private final double HEIGHT_PER_PULSE = (-1.562 * 1e-4)*2; // 2*(1/6400) times 2 for cascade system
-	private final double MAX_POWER_UP = 0.7;
-	private final double MAX_POWER_DOWN = 0.4;
+	private final double HEIGHT_PER_PULSE = (-1.562 * 1e-4); // (1/6400) 
+	private final double MAX_POWER_UP = 0.5;
+	private final double MAX_POWER_DOWN = 0.2;
 	private final double HEIGHT_THRESHOLD = 2; // ft
 	private final double HEIGHT_COAST_RATE = 1; // ft/s
 

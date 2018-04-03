@@ -632,7 +632,7 @@ public class AutoMain {
 
 			// State entry
 			if (performStateEntry) {
-				phaseTimer.setTimer(4);
+				phaseTimer.setTimer(3);
 				performStateEntry = false;
 			}
 			// State processing
@@ -689,7 +689,7 @@ public class AutoMain {
 			if (performStateEntry) {
 
 				Robot.manipulator.outake();
-				phaseTimer.setTimer(0.3);
+				phaseTimer.setTimer(0.1);
 				performStateEntry = false;
 			}
 
@@ -808,25 +808,25 @@ public class AutoMain {
 			}
 			// State processing
 
-			coordinateReached = Robot.manipulator.collect();
+			
 
 			if (setRoutine == LEFT_SCALE_AND_SWITCH) {
-				Robot.driveTrain.driveToCoordinate(FieldLocations.leftCornerCubeLocation);
+				coordinateReached = Robot.driveTrain.driveToCoordinate(FieldLocations.leftCornerCubeLocation);
 
 			} else if (setRoutine == RIGHT_SCALE_AND_SWITCH) {
-				Robot.driveTrain.driveToCoordinate(FieldLocations.rightCornerCubeLocation);
+				coordinateReached = Robot.driveTrain.driveToCoordinate(FieldLocations.rightCornerCubeLocation);
 
 			} else if (setRoutine == CROSS_LEFT_SCALE_SWITCH) {
-				Robot.driveTrain.driveToCoordinate(FieldLocations.leftCornerCubeLocation);
+				coordinateReached = Robot.driveTrain.driveToCoordinate(FieldLocations.leftCornerCubeLocation);
 
 			} else if (setRoutine == CROSS_RIGHT_SCALE_SWITCH) {
-				Robot.driveTrain.driveToCoordinate(FieldLocations.rightCornerCubeLocation);
+				coordinateReached = Robot.driveTrain.driveToCoordinate(FieldLocations.rightCornerCubeLocation);
 
 			} else if (setRoutine == RIGHT_SCALE_LEFT_SWITCH) {
-				Robot.driveTrain.driveToCoordinate(FieldLocations.leftCornerCubeLocation);
+				coordinateReached = Robot.driveTrain.driveToCoordinate(FieldLocations.leftCornerCubeLocation);
 
 			} else if (setRoutine == LEFT_SCALE_RIGHT_SWITCH) {
-				Robot.driveTrain.driveToCoordinate(FieldLocations.rightCornerCubeLocation);
+				coordinateReached = Robot.driveTrain.driveToCoordinate(FieldLocations.rightCornerCubeLocation);
 
 			} else {
 

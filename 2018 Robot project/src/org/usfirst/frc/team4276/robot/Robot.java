@@ -75,9 +75,9 @@ public class Robot extends SampleRobot {
 		armPivoter.initializeThread();
 		elevator.initializeThread();
 		while (isAutonomous() && isEnabled()) {
-			// double desiredCoordinate[] = { 0, 4 };
+			double desiredCoordinate[] = { -6, 2 };
 			// driveTrain.rotateToHeading(90);
-			// driveTrain.rotateToCoordinate(desiredCoordinate);
+			//driveTrain.rotateToCoordinate(desiredCoordinate);
 			// if (driveTrain.driveToCoordinate(desiredCoordinate));
 			autoMain.loop();
 			Timer.delay(0.05);
@@ -87,7 +87,7 @@ public class Robot extends SampleRobot {
 	public void operatorControl() {
 		armPivoter.initializeThread();
 		elevator.initializeThread();
-		//positionFinder.kill();
+		// positionFinder.kill();
 		routineSelector.kill();
 		driveTrain.resetDrive();
 		manipulator.stop();
