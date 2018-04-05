@@ -258,7 +258,7 @@ public class DriveTrain {
 
 		boolean facingTarget = (Math.abs(headingError) < 90);
 
-		if (errorCurrent < ANGLE_DEADBAND) {
+		if (Math.abs(errorCurrent) < ANGLE_DEADBAND) {
 			ANGLER_PROPORTIONAL_GAIN = 0;
 		}
 

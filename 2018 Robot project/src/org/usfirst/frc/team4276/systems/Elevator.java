@@ -18,10 +18,10 @@ public class Elevator extends Thread implements Runnable {
 	private Toggler manualOverrideToggler;
 
 	// Constants - Lower Rail
-	private double STATIC_GAIN_LOWER = .13;
-	private double KP_LOWER = 0 * 1e-3;
-	private double KI_LOWER = 0 * 1e-3;
-	private double KD_LOWER = 0 * 1e-3;
+	private double STATIC_GAIN_LOWER = 0;
+	private double KP_LOWER = 490 * 1e-3;
+	private double KI_LOWER = 11 * 1e-3;
+	private double KD_LOWER = 21 * 1e-3;
 	private final double MAX_HEIGHT_LOWER = 2.625; // ft
 
 	// Constants - Upper Rail
@@ -39,7 +39,7 @@ public class Elevator extends Thread implements Runnable {
 	public final double SETPOINT_BOTTOM = 0; // ft
 	private final double SETPOINT_INCREMENT = .1; // ft
 	private final double OVERRIDE_INCREMENT = 0.3; // 30%
-	private final double HEIGHT_PER_PULSE = (-1.562 * 1e-4); // (1/6400) 
+	private final double HEIGHT_PER_PULSE = (-1.562 * 1e-4); // (1/6400)
 	private final double MAX_POWER_UP = 0.5;
 	private final double MAX_POWER_DOWN = 0.2;
 	private final double HEIGHT_THRESHOLD = 2; // ft
@@ -178,8 +178,8 @@ public class Elevator extends Thread implements Runnable {
 
 	private void limitCommandedPower(double maxClimbPower) {
 		// Limit the range of commanded power
-		if (commandedPower > MAX_POWER_UP) {
-			commandedPower = MAX_POWER_UP;
+		if (commandedPower > maxClimbPower) {
+			commandedPower = maxClimbPower;
 		} else if (commandedPower < -maxClimbPower) {
 			commandedPower = -maxClimbPower;
 		}
@@ -253,6 +253,7 @@ public class Elevator extends Thread implements Runnable {
 		SmartDashboard.putNumber("Commanded arm height", commandedHeight);
 		SmartDashboard.putNumber("Estimated arm height", estimatedHeight);
 		SmartDashboard.putBoolean("Elevator override", manualOverrideIsEngaged);
+		SmartDashboard.putBoolean("Climbing Mode", isClimbing);
 		SmartDashboard.putNumber("Elevator power", commandedPower);
 	}
 
@@ -276,8 +277,9 @@ public class Elevator extends Thread implements Runnable {
 
 	public void run() {
 		while (true) {
-			tuneControlGains(); // for gain tuning only - COMMENT THIS LINE OUT
-								// FOR COMPETITION
+			// tuneControlGains(); // for gain tuning only - COMMENT THIS LINE
+			// OUT
+			// FOR COMPETITION
 			manualOverrideToggler.updateMechanismState();
 			manualOverrideIsEngaged = manualOverrideToggler.getMechanismState();
 			if (manualOverrideIsEngaged) {

@@ -18,16 +18,17 @@ public class ArmPivoter extends Thread implements Runnable {
 	private SoftwareTimer armTimer;
 
 	// Constants
-	private double STATIC_GAIN = 0.37;//0.41 max 0.34 min
-	private double PROPORTIONAL_GAIN = 11600 *1e-6;
-	private double INTEGRAL_GAIN = 430 *1e-6;
-	private double DERIVATIVE_GAIN = 3110 *1e-6;
+	private double STATIC_GAIN = 0.37;// 0.41 max 0.34 min
+	private double PROPORTIONAL_GAIN = 11600 * 1e-6;
+	private double INTEGRAL_GAIN = 430 * 1e-6;
+	private double DERIVATIVE_GAIN = 3110 * 1e-6;
 	private final double STARTING_ANGLE = 90;
 	private final double SETPOINT_INCREMENT = 5; // deg
 	private final double MAX_POWER = 1;
 	private final double UPPER_LIMIT = 85;
 	private final double LOWER_LIMIT = -10;
-	private final double DEGREES_PER_PULSE = 5.506 * 1e-4; // 0.0004459828 actual robot
+	private final double DEGREES_PER_PULSE = 0.0004459828; // 0.0004459828
+															// actual robot
 	private final double ANGLE_THRESHOLD = 90; // deg
 	private final double ANGLE_COAST_RATE = 90; // deg/s
 
@@ -106,13 +107,13 @@ public class ArmPivoter extends Thread implements Runnable {
 			// For large height errors, follow coast speed until close to target
 			if (angleError > ANGLE_THRESHOLD) {
 				angleError = ANGLE_THRESHOLD; // limiting to 90 deg
-				rateError = ANGLE_COAST_RATE + rateError; // coast speed = 90 deg/s
+				rateError = ANGLE_COAST_RATE + rateError; // coast speed = 90
+															// deg/s
 			}
 
 			// Compute PID active power
 			activePower = PROPORTIONAL_GAIN * angleError + INTEGRAL_GAIN * accumulatedError
 					+ DERIVATIVE_GAIN * rateError;
-
 
 		}
 	}
@@ -176,7 +177,6 @@ public class ArmPivoter extends Thread implements Runnable {
 		SmartDashboard.putNumber("Commanded Arm Angle", commandedAngle);
 		SmartDashboard.putNumber("Estimated Arm Angle", estimatedAngle);
 		SmartDashboard.putBoolean("Pivoter override", manualOverrideIsEngaged);
-		
 
 		SmartDashboard.putNumber("Pivoter Kstatic", STATIC_GAIN);
 		SmartDashboard.putNumber("Pivoter Kp*1e-6", PROPORTIONAL_GAIN * 1e6);
@@ -208,7 +208,7 @@ public class ArmPivoter extends Thread implements Runnable {
 
 	public void run() {
 		while (true) {
-			//tuneControlGains(); // for gain tuning only - COMMENT THIS LINE
+			// tuneControlGains(); // for gain tuning only - COMMENT THIS LINE
 			// OUT FOR
 			// COMPETITION
 			manualOverrideTogglerPivot.updateMechanismState();
