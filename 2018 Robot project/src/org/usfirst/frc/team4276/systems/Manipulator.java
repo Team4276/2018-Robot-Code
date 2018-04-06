@@ -23,7 +23,7 @@ public class Manipulator {
 	boolean autoGrabInit = true;
 	boolean isIntaked = false;
 	final double INTAKE_SPEED = -.5;
-	final double OUTAKE_SPEED = 0.3;
+	final double OUTAKE_SPEED = 0.25;
 	final double SHOOT_SPEED = 1;
 
 	final int OFF = 0;

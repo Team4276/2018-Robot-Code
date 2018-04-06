@@ -14,6 +14,7 @@ public class FieldLocations {
 	public static final double[] SWITCH_PREP_RIGHT_A = new double[] { 7.2, 9.6 };
 	public static final double[] SWITCH_PREP_LEFT_B = new double[] { 14, 22 };
 	public static final double[] SWITCH_PREP_RIGHT_B = new double[] { 14, 5 };
+	public static final double[] CUBE_PYRAMID = new double[] { 10, 13.5 };
 
 	public static final double[] leftScaleLocation = new double[] { 27, 19.5 };
 	public static final double[] rightScaleLocation = new double[] { 27, 7.5 };

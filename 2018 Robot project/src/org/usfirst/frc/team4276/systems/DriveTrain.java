@@ -250,29 +250,29 @@ public class DriveTrain {
 		SmartDashboard.putNumber("Distance Error", errorCurrent);
 
 		final double MAX_POWER = 0.5;
-		final double LINEAR_PROPORTIONAL_GAIN = .09;
+		final double LINEAR_PROPORTIONAL_GAIN = .09;// 1/feet
 		final double LINEAR_INTEGRAL_GAIN = 0.009;
-		double ANGLER_PROPORTIONAL_GAIN = .008;
-		final double ANGLE_DEADBAND = 1;// degrees
-		final double LINEAR_DEADBAND = 0.3; // feet
+		double ANGULAR_PROPORTIONAL_GAIN = .008; // 1/degree
+		final double LINEAR_ANGLE_DEADBAND = 0.5;// feet
+		final double LINEAR_DEADBAND = 0.5; // feet
 
 		boolean facingTarget = (Math.abs(headingError) < 90);
 
-		if (Math.abs(errorCurrent) < ANGLE_DEADBAND) {
-			ANGLER_PROPORTIONAL_GAIN = 0;
+		if (Math.abs(errorCurrent) < LINEAR_ANGLE_DEADBAND) {
+			ANGULAR_PROPORTIONAL_GAIN = 0;
 		}
 
 		if (facingTarget) {
 			leftDrivePower = -1 * (LINEAR_PROPORTIONAL_GAIN * errorCurrent + LINEAR_INTEGRAL_GAIN * accumulatedError
-					- ANGLER_PROPORTIONAL_GAIN * headingError);
+					- ANGULAR_PROPORTIONAL_GAIN * headingError);
 			rightDrivePower = -1 * (LINEAR_PROPORTIONAL_GAIN * errorCurrent + LINEAR_INTEGRAL_GAIN * accumulatedError
-					+ ANGLER_PROPORTIONAL_GAIN * headingError);
+					+ ANGULAR_PROPORTIONAL_GAIN * headingError);
 			SmartDashboard.putString("Direction", "facing");
 		} else {
 			leftDrivePower = LINEAR_PROPORTIONAL_GAIN * errorCurrent + LINEAR_INTEGRAL_GAIN * accumulatedError
-					+ ANGLER_PROPORTIONAL_GAIN * headingError;
+					+ ANGULAR_PROPORTIONAL_GAIN * headingError;
 			rightDrivePower = LINEAR_PROPORTIONAL_GAIN * errorCurrent + LINEAR_INTEGRAL_GAIN * accumulatedError
-					- ANGLER_PROPORTIONAL_GAIN * headingError;
+					- ANGULAR_PROPORTIONAL_GAIN * headingError;
 
 			SmartDashboard.putString("Direction", "away");
 		}
@@ -288,7 +288,7 @@ public class DriveTrain {
 
 		if (rightDrivePower > MAX_POWER)
 			rightDrivePower = MAX_POWER;
-		
+
 		if (leftDrivePower < -MAX_POWER)
 			leftDrivePower = -MAX_POWER;
 
