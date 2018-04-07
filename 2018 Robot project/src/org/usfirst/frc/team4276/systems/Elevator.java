@@ -286,7 +286,7 @@ public class Elevator extends Thread implements Runnable {
 				computeManualPowerOffset();
 				if (Robot.xboxController.getPOV(Xbox.DPad) == Xbox.POVdown) {
 					isClimbing = true;
-					commandedPower = -.7;
+					commandedPower = -1;
 				} else {
 					isClimbing = false;
 					commandedPower = staticPower + manualPower;
@@ -301,10 +301,7 @@ public class Elevator extends Thread implements Runnable {
 			}
 			if (!isClimbing) {
 				limitCommandedPower();
-			} else {
-				limitCommandedPower(.7);
 			}
-			limitCommandedPower();
 			elevatorDriverMainR1.set(ControlMode.PercentOutput, -commandedPower);
 			elevatorDriverR2.set(ControlMode.PercentOutput, -commandedPower);
 			// negative because facing opposite direction

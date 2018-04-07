@@ -199,12 +199,9 @@ public class DriveTrain {
 		accumulatedError = accumulatedError + (headingErrorCurrent + errorLast) * timeStep;
 		// calculates integral of heading error
 
-		double errorRate = (headingErrorCurrent - errorLast) / timeStep; // integral
-
-		final double PROPORTIONAL_GAIN = 0.003;
+		final double PROPORTIONAL_GAIN = 0.0027;
 		final double INTEGRAL_GAIN = 0.0006;
 		final double POSITION_DEADBAND = 2; // degrees
-		final double RATE_DEADBAND = 10; // degrees per second
 
 		leftDrivePower = PROPORTIONAL_GAIN * headingErrorCurrent + INTEGRAL_GAIN * accumulatedError;
 		rightDrivePower = -1 * (PROPORTIONAL_GAIN * headingErrorCurrent + INTEGRAL_GAIN * accumulatedError);

@@ -10,23 +10,23 @@ public class FieldLocations {
 
 	public static final double[] CENTER_DRIVE_OFF_WALL = new double[] { 4.42, 13.5 };
 	public static final double[] CROSS_BASE_LINE = new double[] { 27, 13.5 };
-	public static final double[] SWITCH_PREP_LEFT_A = new double[] { 7.2, 17.4 };
-	public static final double[] SWITCH_PREP_RIGHT_A = new double[] { 7.2, 9.6 };
+	public static final double[] SWITCH_PREP_LEFT_A = new double[] { 7.2, 17 };
+	public static final double[] SWITCH_PREP_RIGHT_A = new double[] { 7.2, 10 };
 	public static final double[] SWITCH_PREP_LEFT_B = new double[] { 14, 22 };
 	public static final double[] SWITCH_PREP_RIGHT_B = new double[] { 14, 5 };
 	public static final double[] CUBE_PYRAMID = new double[] { 10, 13.5 };
 
 	public static final double[] leftScaleLocation = new double[] { 27, 19.5 };
 	public static final double[] rightScaleLocation = new double[] { 27, 7.5 };
-	public static final double[] leftSwitchLocation = new double[] { 14, 18 };
-	public static final double[] rightSwitchLocation = new double[] { 14, 9 };
+	public static final double[] leftSwitchLocation = new double[] { 14, 17 };
+	public static final double[] rightSwitchLocation = new double[] { 14, 8 };
 	public static final double[] leftCornerCubeLocation = new double[] { 16.9, 19.3 };
 	public static final double[] rightCornerCubeLocation = new double[] { 16.9, 7.6 };
 
 	public static final double[] leftScaleScoringZoneA = new double[] { 24, 20 };
 	public static final double[] rightScaleScoringZoneA = new double[] { 24, 7 };
-	public static final double[] leftSwitchScoringZoneA = new double[] { 12, 19 };
-	public static final double[] rightSwitchScoringZoneA = new double[] { 12, 8 };
+	public static final double[] leftSwitchScoringZoneA = new double[] { 12, 18 };
+	public static final double[] rightSwitchScoringZoneA = new double[] { 12, 9 };
 	public static final double[] leftScaleScoringZoneB = new double[] { 27, 21.7 };
 	public static final double[] rightScaleScoringZoneB = new double[] { 27, 5.3 };
 	public static final double[] leftSwitchScoringZoneB = new double[] { 13.9, 20.6 };

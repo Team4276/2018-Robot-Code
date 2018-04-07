@@ -157,9 +157,10 @@ public class AutoMain {
 					setRoutine = LEFT_SWITCH;
 				} else if (switchValue == RIGHT_SWITCH) {
 					// if switch on other side
-					setRoutine = CROSS_RIGHT_SWITCH;
+					setRoutine = DEFAULT;
 				} else {
 					// if all scoring is on right side
+					setRoutine = DEFAULT;
 					SmartDashboard.putNumber("Auto Error", ROUTE_PLAN_ERROR);
 				}
 			} else if (startIsRight) {
@@ -170,9 +171,10 @@ public class AutoMain {
 					setRoutine = RIGHT_SWITCH;
 				} else if (scaleValue == LEFT_SWITCH) {
 					// if scale on this side
-					setRoutine = CROSS_LEFT_SWITCH;
+					setRoutine = DEFAULT;
 				} else {
 					// if all scoring is on left side
+					setRoutine = DEFAULT;
 					SmartDashboard.putNumber("Auto Error", ROUTE_PLAN_ERROR);
 				}
 			} else {
